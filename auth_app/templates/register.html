@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script>
+  // Add error handling for form submission
+  document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+      form.addEventListener('submit', function(e) {
+        console.log('Form is being submitted:', form.action);
+        // Don't prevent default - let it submit
+      });
+    });
+    
+    // Log any JavaScript errors
+    window.addEventListener('error', function(e) {
+      console.error('JavaScript error:', e.message, 'at', e.filename, ':', e.lineno);
+    });
+  });
+</script>
+
+  <!-- Register Section -->
+  <section class="auth-section py-5">
+    <div class="container">
+      <!-- Messages display -->
+      {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      <!-- Simple test form for debugging -->
+      <div class="container mt-3 mb-5">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Test Registration - Traveler</h5>
+              </div>
+              <div class="card-body">
+                <form method="post" action="{% url 'register' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="user_type" value="traveler">
+                  <div class="mb-3">
+                    <label for="testEmail" class="form-label">Email:</label>
+                    <input type="email" name="touristEmail" id="testEmail" class="form-control" placeholder="your.email@example.com" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testPassword" class="form-label">Password:</label>
+                    <div class="input-group">
+                      <input type="password" name="touristPassword" id="testPassword" class="form-control" placeholder="Min. 8 characters" required>
+                      <span class="input-group-text password-toggle"><i class="far fa-eye"></i></span>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testConfirmPassword" class="form-label">Confirm Password:</label>
+                    <div class="input-group">
+                      <input type="password" name="touristConfirmPassword" id="testConfirmPassword" class="form-control" placeholder="Confirm password" required>
+                      <span class="input-group-text password-toggle"><i class="far fa-eye"></i></span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="testFirstName" class="form-label">First Name:</label>
+                      <input type="text" name="touristFirstName" id="testFirstName" class="form-control" placeholder="John" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="testLastName" class="form-label">Last Name:</label>
+                      <input type="text" name="touristLastName" id="testLastName" class="form-control" placeholder="Doe" required>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testPhone" class="form-label">Phone:</label>
+                    <input type="text" name="touristPhone" id="testPhone" class="form-control" placeholder="+1234567890" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100">Register as Traveler <i class="fas fa-arrow-right ms-2"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-map me-2"></i>Test Registration - Tour Guide</h5>
+              </div>
+              <div class="card-body">
+                <form method="post" action="{% url 'register' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="user_type" value="tour_guide">
+                  <div class="mb-3">
+                    <label for="testGuideEmail" class="form-label">Email:</label>
+                    <input type="email" name="guideEmail" id="testGuideEmail" class="form-control" placeholder="guide.email@example.com" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testGuidePassword" class="form-label">Password:</label>
+                    <div class="input-group">
+                      <input type="password" name="guidePassword" id="testGuidePassword" class="form-control" placeholder="Min. 8 characters" required>
+                      <span class="input-group-text password-toggle"><i class="far fa-eye"></i></span>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testGuideConfirmPassword" class="form-label">Confirm Password:</label>
+                    <div class="input-group">
+                      <input type="password" name="guideConfirmPassword" id="testGuideConfirmPassword" class="form-control" placeholder="Confirm password" required>
+                      <span class="input-group-text password-toggle"><i class="far fa-eye"></i></span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="testGuideFirstName" class="form-label">First Name:</label>
+                      <input type="text" name="guideFirstName" id="testGuideFirstName" class="form-control" placeholder="John" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="testGuideLastName" class="form-label">Last Name:</label>
+                      <input type="text" name="guideLastName" id="testGuideLastName" class="form-control" placeholder="Doe" required>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testGuidePhone" class="form-label">Phone:</label>
+                    <input type="text" name="guidePhone" id="testGuidePhone" class="form-control" placeholder="+1234567890" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testGuideLocation" class="form-label">Location:</label>
+                    <input type="text" name="guideLocation" id="testGuideLocation" class="form-control" placeholder="City, Country" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testGuideExperience" class="form-label">Years of Experience:</label>
+                    <input type="number" name="guideExperience" id="testGuideExperience" class="form-control" placeholder="1-10" min="0" max="50" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="testGuideBio" class="form-label">Bio:</label>
+                    <textarea name="guideBio" id="testGuideBio" class="form-control" rows="3" placeholder="Tell us about yourself..." required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-success w-100">Register as Tour Guide <i class="fas fa-arrow-right ms-2"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+          
+          <!-- Guide Benefits -->
+          <div class="guide-benefits mt-5">
+            <h3 class="fw-bold text-center mb-4">Benefits of Being a Tour Guide</h3>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+              <div class="col">
+                <div class="benefit-card text-center">
+                  <div class="benefit-icon">
+                    <i class="fas fa-money-bill-wave fa-3x text-primary"></i>
+                  </div>
+                  <h4 class="fw-bold">Earn Money</h4>
+                  <p>Set your own prices and keep up to 85% of what you earn from each booking.</p>
+                </div>
+              </div>
+              <div class="col">
+                <div class="benefit-card text-center">
+                  <div class="benefit-icon">
+                    <i class="fas fa-calendar-alt fa-3x text-primary"></i>
+                  </div>
+                  <h4 class="fw-bold">Flexible Schedule</h4>
+                  <p>Create packages and set availability according to your own schedule.</p>
+                </div>
+              </div>
+              <div class="col">
+                <div class="benefit-card text-center">
+                  <div class="benefit-icon">
+                    <i class="fas fa-globe-asia fa-3x text-primary"></i>
+                  </div>
+                  <h4 class="fw-bold">Share Your Expertise</h4>
+                  <p>Showcase your knowledge and promote local tourism in Bangladesh.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

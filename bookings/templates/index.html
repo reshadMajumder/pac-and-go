@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <!-- Hero Section with Carousel -->
+  <section id="hero" class="hero-section">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="overlay"></div>
+          <img src="https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg" class="d-block w-100" alt="Cox's Bazar Beach">
+          <div class="carousel-caption">
+            <h1 class="display-4 fw-bold text-white">Discover the Beauty of Bangladesh</h1>
+            <p class="lead">Explore stunning beaches, lush forests, and vibrant cultures with our expert guides</p>
+            <a href="pages/packages.html" class="btn btn-primary btn-lg px-4 mt-3">Explore Packages</a>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="overlay"></div>
+          <img src="https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg" class="d-block w-100" alt="Sundarban Mangrove Forest">
+          <div class="carousel-caption">
+            <h1 class="display-4 fw-bold text-white">Adventure Awaits in Sundarban</h1>
+            <p class="lead">Experience the world's largest mangrove forest with our experienced tour guides</p>
+            <a href="pages/packages.html" class="btn btn-primary btn-lg px-4 mt-3">Book Now</a>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="overlay"></div>
+          <img src="https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg" class="d-block w-100" alt="Sylhet Tea Gardens">
+          <div class="carousel-caption">
+            <h1 class="display-4 fw-bold text-white">Explore the Tea Gardens of Sylhet</h1>
+            <p class="lead">Immerse yourself in the lush greenery and cultural heritage of Bangladesh's tea country</p>
+            <a href="pages/packages.html" class="btn btn-primary btn-lg px-4 mt-3">View Itineraries</a>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Search Section -->
+  <section class="search-section py-5">
+    <div class="container">
+      <div class="search-card">
+        <form class="row g-3">
+          <div class="col-md-4">
+            <label for="destination" class="form-label">Destination</label>
+            <select class="form-select" id="destination">
+              <option selected>Choose destination...</option>
+              <option>Cox's Bazar</option>
+              <option>Sylhet</option>
+              <option>Sundarban</option>
+              <option>Bandarban</option>
+              <option>Saint Martin</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date">
+          </div>
+          <div class="col-md-3">
+            <label for="guests" class="form-label">Guests</label>
+            <select class="form-select" id="guests">
+              <option selected>1 Guest</option>
+              <option>2 Guests</option>
+              <option>3 Guests</option>
+              <option>4+ Guests</option>
+            </select>
+          </div>
+          <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Packages Section -->
+  <section class="featured-packages py-5">
+    <div class="container">
+      <div class="section-header text-center mb-5">
+        <h2 class="display-5 fw-bold">Featured Tour Packages</h2>
+        <p class="text-muted">Explore our most popular and highly-rated travel experiences</p>
+      </div>
+      
+      <div class="row g-4">
+        {% for package in packages %}
+        <div class="col-md-6 col-lg-4">
+          <div class="package-card">
+            <div class="package-card-img">
+              <img src="{{ package.image.url }}" alt="{{ package.title }}" class="img-fluid">
+            </div>
+            <div class="package-card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="badge bg-light text-dark"><i class="fas fa-calendar-alt me-1"></i> {{ package.start_date|date:"d M" }} - {{ package.end_date|date:"d M" }}</span>
+                <span class="text-primary fw-bold">৳{{ package.price }}</span>
+              </div>
+              <h3 class="package-title">{{ package.title }}</h3>
+              <p class="package-location"><i class="fas fa-map-marker-alt text-danger"></i> {{ package.location }}</p>
+              <div class="package-meta d-flex justify-content-between mb-3">
+                {% for location in package.location.all %}
+                <span><i class="fas fa-hotel text-muted me-1"></i> {{ location.hotel }}</span>
+                {% endfor %}
+                <span><i class="fas fa-utensils text-muted me-1"></i> 
+                  {% if package.complementary == 'breakfast' %}
+                    Breakfast
+                  {% elif package.complementary == 'all_meals' %}
+                    All Meals
+                  {% elif package.complementary == 'breakfast_lunch' %}
+                    Breakfast & Lunch
+                  {% endif %}
+                </span>
+              </div>
+              <a href="{% url 'package-details' package.id %}" class="btn btn-outline-primary w-100">View Details</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      
+      <div class="text-center mt-5">
+        {% comment %} <a href="{% url 'packages' %}" class="btn btn-outline-primary btn-lg">View All Packages</a> {% endcomment %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="why-choose-us py-5 bg-light">
+    <div class="container">
+      <div class="section-header text-center mb-5">
+        <h2 class="display-5 fw-bold">Why Choose Pac-and-Go?</h2>
+        <p class="text-muted">We're committed to providing the best travel experience</p>
+      </div>
+      
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="feature-card text-center">
+            <div class="feature-icon mb-3">
+              <i class="fas fa-user-tie fa-3x text-primary"></i>
+            </div>
+            <h3>Expert Local Guides</h3>
+            <p>Our tour guides are certified professionals with deep knowledge of local culture, history, and hidden gems.</p>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="feature-card text-center">
+            <div class="feature-icon mb-3">
+              <i class="fas fa-hand-holding-usd fa-3x text-primary"></i>
+            </div>
+            <h3>Best Price Guarantee</h3>
+            <p>We offer the most competitive prices for premium travel experiences with no hidden costs.</p>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="feature-card text-center">
+            <div class="feature-icon mb-3">
+              <i class="fas fa-shield-alt fa-3x text-primary"></i>
+            </div>
+            <h3>Safe & Secure</h3>
+            <p>Your safety is our priority. We follow strict safety protocols and provide 24/7 support during your trip.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Become a Guide Section -->
+  <section class="become-guide py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <img src="https://images.pexels.com/photos/1813922/pexels-photo-1813922.jpeg" alt="Tour Guide" class="img-fluid rounded-3">
+        </div>
+        <div class="col-lg-6">
+          <div class="p-4">
+            <h2 class="display-6 fw-bold mb-3">Become a Tour Guide</h2>
+            <p class="lead">Share your passion for Bangladesh and earn by creating unique travel experiences.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle text-success me-2"></i> Create and manage your own tour packages</li>
+              <li><i class="fas fa-check-circle text-success me-2"></i> Set your own prices and availability</li>
+              <li><i class="fas fa-check-circle text-success me-2"></i> Showcase your expertise and knowledge</li>
+              <li><i class="fas fa-check-circle text-success me-2"></i> Connect with travelers from around the world</li>
+            </ul>
+            <a href="{% url 'home' %}" class="btn btn-primary btn-lg mt-3">Register as Guide</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  {% endblock %}
