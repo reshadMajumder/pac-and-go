@@ -12,7 +12,7 @@ This document provides step-by-step instructions to set up and run the project.
 
 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/pac-and-go.git
+git clone https://github.com/reshadMajumder/pac-and-go.git
 cd pac-and-go
 ```
 
@@ -51,10 +51,6 @@ To create a superuser (admin):
 python manage.py createsuperuser
 ```
 
-To run tests:
-```bash
-python manage.py test
-```
 
 ## Deactivating Virtual Environment
 
