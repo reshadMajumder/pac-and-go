@@ -1,10 +1,17 @@
 from django.urls import path
-from .views import home,package_details,contact_us,about_us
+from . import views
 
 urlpatterns = [
-    path('', home, name='home'),
-    path('about/', about_us, name='about'),
-    path('contact/', contact_us, name='contact'),
-    path('package-details/<int:id>', package_details, name='package-details'),
-
+    path('', views.home, name='home'),
+    path('about/', views.about_us, name='about'),
+    path('contact/', views.contact_us, name='contact'),
+    path('package-details/<int:package_id>/', views.package_details, name='package-details'),
+    
+    # Tour Guide Dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('create-package/', views.create_package, name='create-package'),
+    path('update-package/<int:package_id>/', views.update_package, name='update-package'),
+    path('delete-package/<int:package_id>/', views.delete_package, name='delete-package'),
+    path('update-profile/', views.update_profile, name='update-profile'),
+    path('update-profile-picture/', views.update_profile_picture, name='update-profile-picture'),
 ]

@@ -108,7 +108,7 @@
                 <span class="text-primary fw-bold">৳{{ package.price }}</span>
               </div>
               <h3 class="package-title">{{ package.title }}</h3>
-              <p class="package-location"><i class="fas fa-map-marker-alt text-danger"></i> {{ package.location }}</p>
+              <p class="package-location"><i class="fas fa-map-marker-alt text-danger"></i> {{ package.main_location }}</p>
               <div class="package-meta d-flex justify-content-between mb-3">
                 {% for location in package.location.all %}
                 <span><i class="fas fa-hotel text-muted me-1"></i> {{ location.hotel }}</span>

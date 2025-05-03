@@ -131,11 +131,11 @@ def  handle_login(request):
     if request.method ==  "POST":
         data=request.POST
 
-        username=data.get('email')
+        email=data.get('email')
         password=data.get('password')
 
 
-        user=authenticate(username=username,password=password)
+        user=authenticate(email=email,password=password)
         if user is not None:
             auth_login(request,user)
             print("logged in")
