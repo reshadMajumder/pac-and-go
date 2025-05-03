@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'auth_app',
     'bookings',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +134,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'auth_app.CustomUser'
+
+
+# settings.py
+SSL_COMMERZ_STORE_ID =os.getenv('SSL_COMMERZ_STORE_ID')
+SSL_COMMERZ_STORE_PASSWORD =os.getenv('SSL_COMMERZ_STORE_PASSWORD')
+SSL_COMMERZ_SANDBOX_MODE = os.getenv('SSL_COMMERZ_SANDBOX_MODE')  # False in production
+
+SSL_SUCCESS_URL = 'http://127.0.0.1:8000/payment/success/'
+SSL_FAIL_URL = 'http://127.0.0.1:8000/payment/fail/'
+SSL_CANCEL_URL = 'http://127.0.0.1:8000/payment/cancel/'

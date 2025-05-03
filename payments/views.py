@@ -1,0 +1,84 @@
+# views.py
+
+import requests
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.http import JsonResponse
+from .models import Booking
+from bookings.models import Packages  # adjust if needed
+
+def initiate_payment(request, package_id):
+    package = get_object_or_404(Packages, id=package_id)
+    
+    booking = Booking.objects.create(
+        user=request.user,
+        package=package,
+        amount=package.price,
+        status='Pending'
+    )
+    
+    data = {
+        'store_id': settings.SSL_COMMERZ_STORE_ID,
+        'store_passwd': settings.SSL_COMMERZ_STORE_PASSWORD,
+        'total_amount': package.price,
+        'currency': "BDT",
+        'tran_id': f"BOOKING{booking.id}",
+        'success_url': settings.SSL_SUCCESS_URL,
+        'fail_url': settings.SSL_FAIL_URL,
+        'cancel_url': settings.SSL_CANCEL_URL,
+        'cus_name': request.user.first_name,
+        'cus_email': request.user.email,
+        'cus_phone': request.user.phone_number,
+        'cus_add1': request.user.address or 'Dhaka',
+        'cus_city': "Dhaka",
+        'cus_country': "Bangladesh",
+        'product_name': package.title,
+        'product_category': "Tour",
+        'product_profile': "general",
+        'shipping_method': 'NO',  # ✅ Add this line
+
+    }
+
+    url = "https://sandbox.sslcommerz.com/gwprocess/v4/api.php" if settings.SSL_COMMERZ_SANDBOX_MODE else "https://securepay.sslcommerz.com/gwprocess/v4/api.php"
+    
+    response = requests.post(url, data=data)
+    response_data = response.json()
+
+    if response_data['status'] == 'SUCCESS':
+        return redirect(response_data['GatewayPageURL'])
+    else:
+        return JsonResponse({'error': 'Failed to initiate payment', 'response': response_data})
+
+
+@csrf_exempt
+def payment_success(request):
+    data = request.POST
+    tran_id = data.get('tran_id')
+    status = data.get('status')
+    
+    booking_id = tran_id.replace("BOOKING", "")
+    booking = get_object_or_404(Booking, id=booking_id)
+    
+    if status == 'VALID':
+        booking.status = 'Success'
+        booking.transaction_id = tran_id
+        booking.save()
+    
+    return render(request, 'success.html', {'booking': booking})
+
+
+@csrf_exempt
+def payment_fail(request):
+    data = request.POST
+    tran_id = data.get('tran_id')
+    booking_id = tran_id.replace("BOOKING", "")
+    booking = get_object_or_404(Booking, id=booking_id)
+    booking.status = 'Failed'
+    booking.save()
+    return render(request, 'fail.html', {'booking': booking})
+
+
+@csrf_exempt
+def payment_cancel(request):
+    return render(request, 'cancel.html')

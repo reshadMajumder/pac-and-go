@@ -33,19 +33,19 @@
               <i class="fas fa-plus-circle me-2"></i>Create Package
             </a>
           </li>
-          {% endif %}
-          {% if user.user_type == 'tour_guide' %}
           <li class="nav-item">
             <a class="nav-link" href="#bookings" data-bs-toggle="tab">
-              <i class="fas fa-calendar-check me-2"></i>Bookings
+              <i class="fas fa-calendar-check me-2"></i>Manage Bookings
             </a>
           </li>
-          {% else %}
+          {% endif %}
+          
           <li class="nav-item">
             <a class="nav-link" href="#my-bookings" data-bs-toggle="tab">
-              <i class="fas fa-ticket-alt me-2"></i>My Bookings
+              <i class="fas fa-ticket-alt me-2"></i>Booked Packages
             </a>
           </li>
+          {% if user.user_type == 'traveler' %}
           <li class="nav-item">
             <a class="nav-link" href="#saved-packages" data-bs-toggle="tab">
               <i class="fas fa-heart me-2"></i>Saved Packages
@@ -386,7 +386,9 @@
                       <th>Package</th>
                       <th>Traveler</th>
                       <th>Date</th>
+                      <th>Amount</th>
                       <th>Status</th>
+                      <th>Transaction ID</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -395,25 +397,31 @@
                     <tr>
                       <td>#{{ booking.id }}</td>
                       <td>{{ booking.package.title }}</td>
-                      <td>{{ booking.traveler.user.first_name }} {{ booking.traveler.user.last_name }}</td>
-                      <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+                      <td>{{ booking.user.first_name }} {{ booking.user.last_name }}</td>
+                      <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                      <td>৳{{ booking.amount }}</td>
                       <td>
-                        <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
-                          {{ booking.status|title }}
+                        <span class="badge {% if booking.status == 'Success' %}bg-success{% elif booking.status == 'Pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                          {{ booking.status }}
                         </span>
                       </td>
+                      <td>{{ booking.transaction_id|default:"N/A" }}</td>
                       <td>
-                        <div class="btn-group">
-                          <button type="button" class="btn btn-sm btn-outline-primary view-booking" data-id="{{ booking.id }}">
-                            <i class="fas fa-eye"></i>
-                          </button>
-                          <button type="button" class="btn btn-sm btn-outline-success approve-booking" data-id="{{ booking.id }}">
-                            <i class="fas fa-check"></i>
-                          </button>
-                          <button type="button" class="btn btn-sm btn-outline-danger reject-booking" data-id="{{ booking.id }}">
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </div>
+                        <button type="button" class="btn btn-sm btn-primary view-booking-details" data-bs-toggle="modal" data-bs-target="#viewBookingModal" 
+                          data-id="{{ booking.id }}" 
+                          data-package="{{ booking.package.title }}" 
+                          data-traveler="{{ booking.user.first_name }} {{ booking.user.last_name }}" 
+                          data-email="{{ booking.user.email }}" 
+                          data-date="{{ booking.created_at|date:'M d, Y' }}" 
+                          data-status="{{ booking.status }}" 
+                          data-amount="{{ booking.amount }}" 
+                          data-transaction="{{ booking.transaction_id|default:'N/A' }}"
+                          data-traveler-phone="{{ booking.user.phone_number|default:'N/A' }}"
+                          data-guide-name="{{ booking.package.guide.first_name }} {{ booking.package.guide.last_name }}"
+                          data-guide-email="{{ booking.package.guide.email }}"
+                          data-guide-phone="{{ booking.package.guide.phone_number|default:'N/A' }}">
+                          <i class="fas fa-eye"></i> View Details
+                        </button>
                       </td>
                     </tr>
                     {% endfor %}
@@ -432,12 +440,10 @@
         </div>
         {% endif %}
         
-        <!-- Traveler Specific Tabs -->
-        {% if user.user_type != 'tour_guide' %}
-        <!-- My Bookings Tab for Travelers -->
+        <!-- Booked Packages Tab (For All Users) -->
         <div class="tab-pane fade" id="my-bookings">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h2>My Bookings</h2>
+            <h2>Booked Packages</h2>
           </div>
           
           {% if traveler_bookings %}
@@ -450,7 +456,7 @@
                       <th>Booking ID</th>
                       <th>Package</th>
                       <th>Date</th>
-                      <th>Price</th>
+                      <th>Amount</th>
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -460,19 +466,31 @@
                     <tr>
                       <td>#{{ booking.id }}</td>
                       <td>{{ booking.package.title }}</td>
-                      <td>{{ booking.booking_date|date:"M d, Y" }}</td>
-                      <td>৳{{ booking.package.price }}</td>
+                      <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                      <td>৳{{ booking.amount }}</td>
                       <td>
-                        <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
-                          {{ booking.status|title }}
+                        <span class="badge {% if booking.status == 'Success' %}bg-success{% elif booking.status == 'Pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                          {{ booking.status }}
                         </span>
                       </td>
                       <td>
                         <div class="btn-group">
-                          <a href="{% url 'package-details' booking.package.id %}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-eye"></i>
-                          </a>
-                          {% if booking.status == 'pending' %}
+                          <button type="button" class="btn btn-sm btn-primary view-booking-details" data-bs-toggle="modal" data-bs-target="#viewBookingModal" 
+                            data-id="{{ booking.id }}" 
+                            data-package="{{ booking.package.title }}" 
+                            data-traveler="{{ user.first_name }} {{ user.last_name }}" 
+                            data-email="{{ user.email }}" 
+                            data-date="{{ booking.created_at|date:'M d, Y' }}" 
+                            data-status="{{ booking.status }}" 
+                            data-amount="{{ booking.amount }}" 
+                            data-transaction="{{ booking.transaction_id|default:'N/A' }}"
+                            data-guide-name="{{ booking.package.guide.first_name }} {{ booking.package.guide.last_name }}"
+                            data-guide-email="{{ booking.package.guide.email }}"
+                            data-guide-phone="{{ booking.package.guide.phone_number|default:'N/A' }}"
+                            data-traveler-phone="{{ user.phone_number|default:'N/A' }}">
+                            <i class="fas fa-eye"></i> View Details
+                          </button>
+                          {% if booking.status == 'Pending' %}
                           <button type="button" class="btn btn-sm btn-outline-danger cancel-booking" data-id="{{ booking.id }}">
                             <i class="fas fa-times"></i>
                           </button>
@@ -496,6 +514,8 @@
           {% endif %}
         </div>
         
+        <!-- Traveler Specific Tabs -->
+        {% if user.user_type == 'traveler' %}
         <!-- Saved Packages Tab for Travelers -->
         <div class="tab-pane fade" id="saved-packages">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -714,7 +734,106 @@
   </div>
 </div>
 
-{% block extra_js %}
+<!-- Modal for Viewing Booking Details -->
+<div class="modal fade" id="viewBookingModal" tabindex="-1" aria-labelledby="viewBookingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewBookingModalLabel">Booking Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="booking-details">
+          <div class="mb-3 text-center">
+            <span class="badge bg-secondary" id="booking-status-badge">Pending</span>
+          </div>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="row mb-3">
+                <div class="col-5 text-muted">Booking ID:</div>
+                <div class="col-7" id="booking-id">#000</div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-5 text-muted">Package:</div>
+                <div class="col-7" id="booking-package">Package Name</div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-5 text-muted">Booking Date:</div>
+                <div class="col-7" id="booking-date">Jan 1, 2023</div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-5 text-muted">Amount:</div>
+                <div class="col-7 fw-bold" id="booking-amount">৳0</div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-5 text-muted">Transaction ID:</div>
+                <div class="col-7" id="booking-transaction">N/A</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card border-0 bg-light mb-3">
+                <div class="card-header bg-transparent border-bottom-0">
+                  <h6 class="mb-0">Tour Guide Information</h6>
+                </div>
+                <div class="card-body pt-0">
+                  <div class="row mb-2">
+                    <div class="col-5 text-muted">Name:</div>
+                    <div class="col-7" id="guide-name">Guide Name</div>
+                  </div>
+                  
+                  <div class="row mb-2">
+                    <div class="col-5 text-muted">Email:</div>
+                    <div class="col-7" id="guide-email">guide@example.com</div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-5 text-muted">Phone:</div>
+                    <div class="col-7" id="guide-phone">N/A</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card border-0 bg-light">
+                <div class="card-header bg-transparent border-bottom-0">
+                  <h6 class="mb-0">Traveler Information</h6>
+                </div>
+                <div class="card-body pt-0">
+                  <div class="row mb-2">
+                    <div class="col-5 text-muted">Name:</div>
+                    <div class="col-7" id="booking-traveler">Traveler Name</div>
+                  </div>
+                  
+                  <div class="row mb-2">
+                    <div class="col-5 text-muted">Email:</div>
+                    <div class="col-7" id="booking-email">traveler@example.com</div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-5 text-muted">Phone:</div>
+                    <div class="col-7" id="traveler-phone">N/A</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Edit Profile Functionality
@@ -830,7 +949,71 @@
       });
     }
     {% endif %}
+    
+    // Handle booking details modal
+    const viewBookingModal = document.getElementById('viewBookingModal');
+    if (viewBookingModal) {
+      viewBookingModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        
+        // Get data from button attributes
+        const id = button.getAttribute('data-id');
+        const package = button.getAttribute('data-package');
+        const traveler = button.getAttribute('data-traveler');
+        const email = button.getAttribute('data-email');
+        const date = button.getAttribute('data-date');
+        const status = button.getAttribute('data-status');
+        const amount = button.getAttribute('data-amount');
+        const transaction = button.getAttribute('data-transaction');
+        const guideName = button.getAttribute('data-guide-name');
+        const guideEmail = button.getAttribute('data-guide-email');
+        const guidePhone = button.getAttribute('data-guide-phone');
+        const travelerPhone = button.getAttribute('data-traveler-phone');
+        
+        console.log('Booking ID:', id);
+        console.log('Package:', package);
+        console.log('Traveler:', traveler);
+        console.log('Guide Name:', guideName);
+        
+        // Safely update elements (only if they exist)
+        function updateElement(id, value) {
+          const element = document.getElementById(id);
+          if (element) {
+            element.textContent = value;
+          } else {
+            console.error('Element not found:', id);
+          }
+        }
+        
+        // Update modal content
+        updateElement('booking-id', '#' + (id || '000'));
+        updateElement('booking-package', package || 'Package Name');
+        updateElement('booking-traveler', traveler || 'Traveler Name');
+        updateElement('booking-email', email || 'traveler@example.com');
+        updateElement('booking-date', date || 'Jan 1, 2023');
+        updateElement('booking-amount', '৳' + (amount || '0'));
+        updateElement('booking-transaction', transaction || 'N/A');
+        updateElement('guide-name', guideName || 'Guide Name');
+        updateElement('guide-email', guideEmail || 'guide@example.com');
+        updateElement('guide-phone', guidePhone || 'N/A');
+        updateElement('traveler-phone', travelerPhone || 'N/A');
+        
+        // Update status badge
+        const statusBadge = document.getElementById('booking-status-badge');
+        if (statusBadge) {
+          statusBadge.textContent = status || 'Pending';
+          statusBadge.className = 'badge';
+          
+          if (status === 'Success') {
+            statusBadge.classList.add('bg-success');
+          } else if (status === 'Pending') {
+            statusBadge.classList.add('bg-warning');
+          } else {
+            statusBadge.classList.add('bg-danger');
+          }
+        }
+      });
+    }
   });
 </script>
-{% endblock %}
 {% endblock %}

@@ -4,6 +4,7 @@ from django.http import HttpResponseForbidden
 from django.contrib import messages
 from datetime import datetime
 from .models import Packages, TourLocation, PackageHighlights
+from payments.models import Booking
 
 # Create your views here.
 
@@ -40,20 +41,27 @@ def dashboard(request):
         if request.user.user_type == 'tour_guide':
             # Tour guide specific context
             packages = Packages.objects.filter(guide=request.user)
-            bookings = []  # In the future, you can add: Booking.objects.filter(package__in=packages)
+            
+            # Get bookings for all packages created by this guide
+            bookings = Booking.objects.filter(package__in=packages).select_related('user', 'package')
+            
+            # Get user's own bookings (as traveler)
+            traveler_bookings = Booking.objects.filter(user=request.user).select_related('package')
+            
             recent_activities = []
             
             context.update({
                 "packages": packages,
                 "bookings": bookings,
+                "traveler_bookings": traveler_bookings,
                 "recent_activities": recent_activities,
                 "guide_profile": request.user.guide_profile if hasattr(request.user, 'guide_profile') else None,
             })
         else:
             # Traveler specific context
-            traveler_bookings = []  # In the future, you can add: Booking.objects.filter(traveler__user=request.user)
+            traveler_bookings = Booking.objects.filter(user=request.user).select_related('package')
             saved_packages = []  # In the future, you can add: SavedPackage.objects.filter(traveler__user=request.user)
-            upcoming_trips = 0  # Count of upcoming bookings
+            upcoming_trips = traveler_bookings.filter(status='Success').count()  # Count of upcoming bookings
             featured_packages = Packages.objects.all().order_by('-created_at')[:6]  # Get some featured packages
             
             context.update({
