@@ -17,7 +17,12 @@ class PackageHighlights(models.Model):
     def __str__(self):
         return self.highlight
 
-
+class Transport(models.Model):
+    vehicle=models.CharField(max_length=100,null=True,blank=True)
+    description=models.TextField(null=True,blank=True)
+    
+    def __str__(self):
+        return self.vehicle
 
 
 class Packages(models.Model):
@@ -32,6 +37,7 @@ class Packages(models.Model):
     end_date=models.DateTimeField()
     details=models.TextField()
     complementary=models.CharField(max_length=20,null=True,blank=True ,choices=[('breakfast', 'Breakfast'), ('all_meals', 'All Meals'),('breakfast_lunch','Breakfast & Lunch')])
+    transport=models.ManyToManyField(Transport,related_name='transport')
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
     

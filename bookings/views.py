@@ -3,17 +3,41 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from datetime import datetime
-from .models import Packages, TourLocation, PackageHighlights
+from .models import Packages, TourLocation, PackageHighlights, Transport
 from payments.models import Booking
 
 # Create your views here.
 
 
 def home(request):
+    # Get all packages initially
     packages = Packages.objects.all()
     
+    # Get all unique tour locations
+    tour_locations = TourLocation.objects.values_list('location', flat=True).distinct()
     
-    return render(request, 'index.html', context={"packages": packages})
+    # Handle filtering
+    if request.method == 'GET' and ('location' in request.GET or 'date' in request.GET):
+        filter_location = request.GET.get('location', '')
+        filter_date = request.GET.get('date', '')
+        
+        # Apply location filter if provided
+        if filter_location:
+            packages = packages.filter(location__location=filter_location).distinct()
+        
+        # Apply date filter if provided
+        if filter_date:
+            filter_date_obj = datetime.strptime(filter_date, '%Y-%m-%d').date()
+            packages = packages.filter(
+                start_date__date__lte=filter_date_obj,
+                end_date__date__gte=filter_date_obj
+            ).distinct()
+    
+    context = {
+        'packages': packages,
+        'tour_locations': tour_locations,
+    }
+    return render(request, 'index.html', context)
 
 
 
@@ -35,6 +59,14 @@ def dashboard(request):
     context = {
         "today": datetime.today(),
     }
+    
+    # Get all unique tour locations
+    tour_locations = TourLocation.objects.values_list('location', flat=True).distinct()
+    context["tour_locations"] = tour_locations
+    
+    # Get all unique vehicle types
+    transport_vehicles = Transport.objects.values_list('vehicle', flat=True).distinct()
+    context["transport_vehicles"] = transport_vehicles
     
     # Check user type and prepare specific context
     if hasattr(request.user, 'user_type'):
@@ -129,20 +161,81 @@ def create_package(request):
             tour_locations = request.POST.getlist('tour_location[]')
             tour_hotels = request.POST.getlist('tour_hotel[]')
             
+            # Dictionary to keep track of locations we've seen
+            added_locations = {}
+            
             for i in range(len(tour_locations)):
                 if tour_locations[i] and i < len(tour_hotels):
-                    location = TourLocation.objects.create(
-                        location=tour_locations[i],
-                        hotel=tour_hotels[i]
-                    )
-                    package.location.add(location)  # Adding to many-to-many field
+                    location_name = tour_locations[i]
+                    hotel_name = tour_hotels[i]
+                    
+                    # Check if this is a location that already exists in the database
+                    existing_location = TourLocation.objects.filter(location=location_name, hotel=hotel_name).first()
+                    
+                    if existing_location:
+                        # Use the existing location
+                        location = existing_location
+                    else:
+                        # Create a new location
+                        location = TourLocation.objects.create(
+                            location=location_name,
+                            hotel=hotel_name
+                        )
+                    
+                    # Use location.id as key to avoid duplicates
+                    if location.id not in added_locations:
+                        package.location.add(location)
+                        added_locations[location.id] = True
             
             # Handle package highlights
             highlights = request.POST.getlist('highlight[]')
+            added_highlights = {}
+            
             for highlight_text in highlights:
                 if highlight_text:
-                    highlight = PackageHighlights.objects.create(highlight=highlight_text)
-                    package.highlight.add(highlight)  # Adding to many-to-many field
+                    # Check if highlight already exists
+                    existing_highlight = PackageHighlights.objects.filter(highlight=highlight_text).first()
+                    
+                    if existing_highlight:
+                        highlight = existing_highlight
+                    else:
+                        highlight = PackageHighlights.objects.create(highlight=highlight_text)
+                    
+                    # Avoid duplicates
+                    if highlight.id not in added_highlights:
+                        package.highlight.add(highlight)
+                        added_highlights[highlight.id] = True
+            
+            # Handle transportation
+            transport_vehicles = request.POST.getlist('transport_vehicle[]')
+            transport_descriptions = request.POST.getlist('transport_description[]')
+            added_transports = {}
+            
+            for i in range(len(transport_vehicles)):
+                if transport_vehicles[i] and i < len(transport_descriptions):
+                    vehicle_name = transport_vehicles[i]
+                    description = transport_descriptions[i]
+                    
+                    # Check if this vehicle already exists
+                    existing_transport = Transport.objects.filter(vehicle=vehicle_name).first()
+                    
+                    if existing_transport:
+                        transport = existing_transport
+                        # Update description if it's different
+                        if transport.description != description and description:
+                            transport.description = description
+                            transport.save()
+                    else:
+                        # Create a new transport
+                        transport = Transport.objects.create(
+                            vehicle=vehicle_name,
+                            description=description
+                        )
+                    
+                    # Avoid duplicates
+                    if transport.id not in added_transports:
+                        package.transport.add(transport)
+                        added_transports[transport.id] = True
             
             messages.success(request, 'Package created successfully!')
         except Exception as e:
@@ -310,3 +403,10 @@ def order_details(request, booking_id):
     }
     
     return render(request, 'order_details.html', context)
+
+
+def remove_booking(request,booking_id):
+    booking=get_object_or_404(Booking,id=booking_id)
+    booking.delete()
+    return redirect('dashboard')
+

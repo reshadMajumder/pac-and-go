@@ -11,17 +11,24 @@ from bookings.models import Packages  # adjust if needed
 def initiate_payment(request, package_id):
     package = get_object_or_404(Packages, id=package_id)
     
+    # Get guest count from request
+    guest_count = int(request.GET.get('guest_count', 1))
+    
+    # Calculate total amount
+    total_amount = package.price * guest_count
+    
     booking = Booking.objects.create(
         user=request.user,
         package=package,
-        amount=package.price,
+        guest_count=guest_count,
+        amount=total_amount,
         status='Pending'
     )
     
     data = {
         'store_id': settings.SSL_COMMERZ_STORE_ID,
         'store_passwd': settings.SSL_COMMERZ_STORE_PASSWORD,
-        'total_amount': package.price,
+        'total_amount': total_amount,
         'currency': "BDT",
         'tran_id': f"BOOKING{booking.id}",
         'success_url': settings.SSL_SUCCESS_URL,

@@ -5,22 +5,22 @@
   <!-- Package Header -->
   <section class="package-header">
     <div class="overlay"></div>
-    <img src="https://images.pexels.com/photos/1591373/pexels-photo-1591373.jpeg" alt="Cox's Bazar Beach" class="package-header-img">
+    <img src="{{ package.image.url }}" alt="{{ package.title }}" class="package-header-img">
     <div class="container">
       <div class="package-header-content">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="packages.html">Packages</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Cox's Bazar Beach Retreat</li>
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ package.title }}</li>
           </ol>
         </nav>
-        <h1 class="display-4 fw-bold text-white">Cox's Bazar Beach Retreat</h1>
+        <h1 class="display-4 fw-bold text-white">{{ package.title }}</h1>
         <div class="package-meta">
           <span class="badge bg-success me-2">Best Seller</span>
-          <span class="text-white me-3"><i class="fas fa-map-marker-alt me-1"></i> Cox's Bazar, Bangladesh</span>
-          <span class="text-white me-3"><i class="fas fa-calendar-alt me-1"></i> 3 Days, 2 Nights</span>
-          <span class="text-white"><i class="fas fa-star text-warning me-1"></i> 4.8 (120 reviews)</span>
+          <span class="text-white me-3"><i class="fas fa-map-marker-alt me-1"></i> {{ package.main_location }}</span>
+          <span class="text-white me-3"><i class="fas fa-calendar-alt me-1"></i> 
+            {{ package.start_date|date:"d M" }} - {{ package.end_date|date:"d M" }}
+          </span>
         </div>
       </div>
     </div>
@@ -34,215 +34,70 @@
           <!-- Package Overview -->
           <div class="content-card mb-4">
             <h2 class="fw-bold mb-3">Overview</h2>
-            <p>Experience the world's longest natural sea beach with our expertly crafted Cox's Bazar retreat package. This 3-day adventure offers the perfect blend of relaxation and exploration, allowing you to enjoy the stunning beaches while discovering the local culture and attractions.</p>
-            <p>Our experienced local guides will ensure you experience the best of Cox's Bazar, from the most picturesque spots on the beach to hidden gems only locals know about. With comfortable accommodations, delicious meals, and hassle-free transportation, this package is perfect for couples, families, and solo travelers alike.</p>
+            <p>{{ package.details }}</p>
             
             <div class="package-highlights mt-4">
               <h3 class="fw-bold mb-3">Package Highlights</h3>
               <ul class="highlight-list">
-                <li><i class="fas fa-check-circle text-success me-2"></i> Stay at a premium 4-star beachfront hotel</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i> Enjoy breathtaking views of the Bay of Bengal</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i> Visit Inani Beach and its coral reef</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i> Experience a sunset boat ride</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i> Explore Himchari National Park</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i> Savor fresh seafood and local Bengali cuisine</li>
-                <li><i class="fas fa-check-circle text-success me-2"></i> Shop for local handicrafts and souvenirs</li>
+                {% for highlight in package.highlight.all %}
+                <li><i class="fas fa-check-circle text-success me-2"></i> {{ highlight.highlight }}</li>
+                {% endfor %}
               </ul>
             </div>
           </div>
           
-          <!-- Itinerary Section -->
-          <div class="content-card mb-4">
-            <h2 class="fw-bold mb-3">Detailed Itinerary</h2>
-            
-            <div class="itinerary-day">
-              <div class="day-header" data-bs-toggle="collapse" data-bs-target="#day1">
-                <h3 class="fw-bold mb-0">Day 1: Arrival & Beach Exploration</h3>
-                <i class="fas fa-chevron-down"></i>
-              </div>
-              <div class="collapse show" id="day1">
-                <div class="day-content">
-                  <div class="timeline">
-                    <div class="timeline-item">
-                      <div class="timeline-time">10:00 AM</div>
-                      <div class="timeline-content">
-                        <h5>Pick-up from Cox's Bazar Airport</h5>
-                        <p>Our representative will greet you at the airport and transfer you to your hotel.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">12:00 PM</div>
-                      <div class="timeline-content">
-                        <h5>Hotel Check-in & Welcome Lunch</h5>
-                        <p>Check into your beachfront hotel and enjoy a welcome lunch featuring local specialties.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">2:30 PM</div>
-                      <div class="timeline-content">
-                        <h5>Cox's Bazar Beach Exploration</h5>
-                        <p>Walk along the main beach, take in the views, and enjoy the sea breeze. Optional beach activities available.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">5:30 PM</div>
-                      <div class="timeline-content">
-                        <h5>Sunset at Laboni Point</h5>
-                        <p>Witness a breathtaking sunset at Laboni Point, one of the most picturesque spots on the beach.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">7:30 PM</div>
-                      <div class="timeline-content">
-                        <h5>Dinner at Seafood Restaurant</h5>
-                        <p>Enjoy a delicious dinner featuring fresh seafood at a popular local restaurant.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="itinerary-day">
-              <div class="day-header" data-bs-toggle="collapse" data-bs-target="#day2">
-                <h3 class="fw-bold mb-0">Day 2: Inani Beach & Himchari</h3>
-                <i class="fas fa-chevron-down"></i>
-              </div>
-              <div class="collapse" id="day2">
-                <div class="day-content">
-                  <div class="timeline">
-                    <div class="timeline-item">
-                      <div class="timeline-time">7:30 AM</div>
-                      <div class="timeline-content">
-                        <h5>Breakfast at Hotel</h5>
-                        <p>Enjoy a hearty breakfast with a view of the beach.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">9:00 AM</div>
-                      <div class="timeline-content">
-                        <h5>Inani Beach Excursion</h5>
-                        <p>Visit Inani Beach (30km from Cox's Bazar) known for its clear waters and coral reef.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">12:30 PM</div>
-                      <div class="timeline-content">
-                        <h5>Lunch at Local Restaurant</h5>
-                        <p>Enjoy a traditional Bengali lunch at a beachside restaurant.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">2:00 PM</div>
-                      <div class="timeline-content">
-                        <h5>Himchari National Park</h5>
-                        <p>Explore the beautiful Himchari National Park and its famous waterfall (seasonal).</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">5:00 PM</div>
-                      <div class="timeline-content">
-                        <h5>Sunset Boat Ride</h5>
-                        <p>Experience a magical sunset from a traditional boat on the Bay of Bengal.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">7:30 PM</div>
-                      <div class="timeline-content">
-                        <h5>Dinner & Cultural Show</h5>
-                        <p>Enjoy dinner accompanied by a cultural performance featuring local music and dance.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="itinerary-day">
-              <div class="day-header" data-bs-toggle="collapse" data-bs-target="#day3">
-                <h3 class="fw-bold mb-0">Day 3: Buddhist Temple & Departure</h3>
-                <i class="fas fa-chevron-down"></i>
-              </div>
-              <div class="collapse" id="day3">
-                <div class="day-content">
-                  <div class="timeline">
-                    <div class="timeline-item">
-                      <div class="timeline-time">7:30 AM</div>
-                      <div class="timeline-content">
-                        <h5>Breakfast at Hotel</h5>
-                        <p>Enjoy your final breakfast at the hotel.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">9:00 AM</div>
-                      <div class="timeline-content">
-                        <h5>Visit Ramu Buddhist Temple</h5>
-                        <p>Explore the ancient Buddhist temples and monasteries in Ramu village.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">11:30 AM</div>
-                      <div class="timeline-content">
-                        <h5>Souvenir Shopping</h5>
-                        <p>Shop for local handicrafts, seashell items, and dried fish at Burmese Market.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">1:00 PM</div>
-                      <div class="timeline-content">
-                        <h5>Farewell Lunch</h5>
-                        <p>Enjoy a farewell lunch featuring Bengali specialties.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">2:30 PM</div>
-                      <div class="timeline-content">
-                        <h5>Hotel Check-out</h5>
-                        <p>Check out from the hotel and prepare for departure.</p>
-                      </div>
-                    </div>
-                    <div class="timeline-item">
-                      <div class="timeline-time">3:30 PM</div>
-                      <div class="timeline-content">
-                        <h5>Transfer to Airport</h5>
-                        <p>Transfer to Cox's Bazar Airport for your departure flight.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+
           
           <!-- Accommodation -->
           <div class="content-card mb-4">
             <h2 class="fw-bold mb-3">Accommodation</h2>
             <div class="row">
               <div class="col-md-6">
-                <img src="https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg" alt="Hotel Room" class="img-fluid rounded mb-3">
+                <img src="{{ package.image.url }}" alt="{{ package.title }}" class="img-fluid rounded mb-3">
               </div>
               <div class="col-md-6">
-                <h4>Ocean Paradise Hotel & Resort</h4>
+                <h4>Accommodations</h4>
                 <div class="hotel-rating mb-2">
                   <i class="fas fa-star text-warning"></i>
                   <i class="fas fa-star text-warning"></i>
                   <i class="fas fa-star text-warning"></i>
                   <i class="fas fa-star text-warning"></i>
-                  <span class="ms-2">4-Star</span>
                 </div>
-                <p class="mb-2"><i class="fas fa-map-marker-alt text-danger me-2"></i>Kolatoli Road, Cox's Bazar</p>
-                <p>Enjoy comfortable accommodations at this beachfront property with modern amenities, including a swimming pool, spa, and restaurant with panoramic ocean views.</p>
-                <h5 class="mt-3">Room Features:</h5>
+                <p class="mb-2"><i class="fas fa-map-marker-alt text-danger me-2"></i>{{ package.main_location }}</p>
+                <h5 class="mt-3">Tour Locations:</h5>
                 <ul class="feature-list small">
-                  <li><i class="fas fa-check text-success me-2"></i>Ocean view rooms</li>
-                  <li><i class="fas fa-check text-success me-2"></i>Air conditioning</li>
-                  <li><i class="fas fa-check text-success me-2"></i>Free Wi-Fi</li>
-                  <li><i class="fas fa-check text-success me-2"></i>Private balcony</li>
-                  <li><i class="fas fa-check text-success me-2"></i>En-suite bathroom</li>
-                  <li><i class="fas fa-check text-success me-2"></i>LED TV with satellite channels</li>
+                  {% for location in package.location.all %}
+                  <li><i class="fas fa-check text-success me-2"></i>{{ location.location }}</li>
+                  {% endfor %}
+                </ul>
+                <h5 class="mt-3">Hotels:</h5>
+                <ul class="feature-list small">
+                  {% for location in package.location.all %}
+                  <li><i class="fas fa-check text-success me-2"></i>{{ location.hotel }}</li>
+                  {% endfor %}
                 </ul>
               </div>
             </div>
+          </div>
+          
+          <!-- Transportation -->
+          <div class="content-card mb-4">
+            <h2 class="fw-bold mb-3">Transportation</h2>
+            {% if package.transport.all %}
+              {% for transport in package.transport.all %}
+              <div class="transportation-item">
+                <div class="transportation-icon">
+                  <i class="fas fa-car fa-2x text-primary"></i>
+                </div>
+                <div class="transportation-details">
+                  <h4>{{ transport.vehicle }}</h4>
+                  <p>{{ transport.description }}</p>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+            <p>Transportation details are not specified for this package.</p>
+            {% endif %}
           </div>
           
           <!-- Meals -->
@@ -250,29 +105,21 @@
             <h2 class="fw-bold mb-3">Meals</h2>
             <div class="meal-section">
               <div class="meal-icon">
-                <i class="fas fa-coffee fa-2x text-primary"></i>
-              </div>
-              <div class="meal-details">
-                <h4>Breakfast</h4>
-                <p>Daily buffet breakfast at the hotel featuring both continental and local Bengali options.</p>
-              </div>
-            </div>
-            <div class="meal-section">
-              <div class="meal-icon">
                 <i class="fas fa-utensils fa-2x text-primary"></i>
               </div>
               <div class="meal-details">
-                <h4>Lunch</h4>
-                <p>Daily lunches at selected local restaurants or the hotel, featuring Bengali cuisine and fresh seafood.</p>
-              </div>
-            </div>
-            <div class="meal-section">
-              <div class="meal-icon">
-                <i class="fas fa-hamburger fa-2x text-primary"></i>
-              </div>
-              <div class="meal-details">
-                <h4>Dinner</h4>
-                <p>Evening meals at premium restaurants with a variety of options, including a special seafood dinner and cultural show.</p>
+                <h4>Complementary</h4>
+                <p>
+                  {% if package.complementary == 'breakfast' %}
+                    Breakfast included with your stay.
+                  {% elif package.complementary == 'all_meals' %}
+                    All meals (breakfast, lunch, and dinner) included.
+                  {% elif package.complementary == 'breakfast_lunch' %}
+                    Breakfast and lunch included with your stay.
+                  {% else %}
+                    No meals included.
+                  {% endif %}
+                </p>
               </div>
             </div>
             <div class="meal-note mt-3">
@@ -280,148 +127,87 @@
             </div>
           </div>
           
-          <!-- Transportation -->
-          <div class="content-card mb-4">
-            <h2 class="fw-bold mb-3">Transportation</h2>
-            <div class="transportation-item">
-              <div class="transportation-icon">
-                <i class="fas fa-plane fa-2x text-primary"></i>
-              </div>
-              <div class="transportation-details">
-                <h4>Airport Transfers</h4>
-                <p>Complimentary pickup and drop-off at Cox's Bazar Airport.</p>
-              </div>
-            </div>
-            <div class="transportation-item">
-              <div class="transportation-icon">
-                <i class="fas fa-car fa-2x text-primary"></i>
-              </div>
-              <div class="transportation-details">
-                <h4>Daily Excursions</h4>
-                <p>All sightseeing tours include private air-conditioned vehicles with experienced drivers.</p>
-              </div>
-            </div>
-            <div class="transportation-item">
-              <div class="transportation-icon">
-                <i class="fas fa-ship fa-2x text-primary"></i>
-              </div>
-              <div class="transportation-details">
-                <h4>Boat Rides</h4>
-                <p>Traditional fishing boat for the sunset cruise experience on the Bay of Bengal.</p>
-              </div>
-            </div>
-          </div>
-          
           <!-- Tour Guide -->
+          {% if package.tour_guide %}
           <div class="content-card mb-4">
             <h2 class="fw-bold mb-3">Meet Your Tour Guide</h2>
             <div class="guide-profile">
               <div class="row align-items-center">
                 <div class="col-md-4 text-center">
-                  <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg" alt="Guide" class="guide-img mb-3">
-                  <h4>Rahul Ahmed</h4>
-                  <div class="guide-rating">
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <span class="ms-2">5.0</span>
-                  </div>
+                  {% if package.tour_guide.user.profile_picture %}
+                    <img src="{{ package.tour_guide.user.profile_picture.url }}" alt="Guide" class="guide-img mb-3">
+                  {% else %}
+                    <img src="{% static 'img/default-profile.jpg' %}" alt="Guide" class="guide-img mb-3">
+                  {% endif %}
+                  <h4>{{ package.tour_guide.user.first_name }} {{ package.tour_guide.user.last_name }}</h4>
                 </div>
                 <div class="col-md-8">
-                  <p class="mb-3">Rahul is a certified tour guide with over 8 years of experience leading groups in Cox's Bazar and surrounding areas. Born and raised in the region, he has extensive knowledge of local history, culture, and hidden gems.</p>
+                  <p class="mb-3">{{ package.tour_guide.bio }}</p>
                   <div class="guide-details">
-                    <p><i class="fas fa-graduation-cap text-primary me-2"></i><strong>Certifications:</strong> Bangladesh Tourism Board, First Aid</p>
-                    <p><i class="fas fa-language text-primary me-2"></i><strong>Languages:</strong> Bengali, English, Hindi</p>
-                    <p><i class="fas fa-briefcase text-primary me-2"></i><strong>Experience:</strong> 8+ years</p>
-                    <p><i class="fas fa-award text-primary me-2"></i><strong>Specialties:</strong> Cultural history, Marine wildlife, Photography spots</p>
+                    <p><i class="fas fa-briefcase text-primary me-2"></i><strong>Experience:</strong> {{ package.tour_guide.experience_years }} years</p>
+                    <p><i class="fas fa-language text-primary me-2"></i><strong>Languages:</strong> {{ package.tour_guide.languages }}</p>
+                    <p><i class="fas fa-award text-primary me-2"></i><strong>Expertise:</strong> {{ package.tour_guide.expertise }}</p>
+                    <p><i class="fas fa-map-marker-alt text-primary me-2"></i><strong>Location:</strong> {{ package.tour_guide.location }}</p>
                   </div>
-                  <p class="guide-quote fst-italic">"I love sharing the beauty and culture of my homeland with visitors. Cox's Bazar is more than just a beach—it's a place with rich traditions and natural wonders that I'm passionate about showing to travelers."</p>
                 </div>
               </div>
             </div>
           </div>
-          
-          <!-- Reviews Section -->
-          
+          {% endif %}
         </div>
         
         <div class="col-lg-4">
           <!-- Booking Card -->
           <div class="booking-card sticky-md-top">
             <div class="price-section">
-              <div class="discount-badge">20% OFF</div>
               <div class="price-wrapper">
-                <span class="original-price">৳18,750</span>
-                <span class="current-price">৳15,000</span>
+                <span class="current-price">৳{{ package.price }}</span>
               </div>
               <span class="price-per">per person</span>
             </div>
             
-            <form class="booking-form">
+            <form action="{% url 'initiate_payment' package.id %}" method="GET" class="booking-form" id="bookingForm">
+              {% csrf_token %}
               <div class="mb-3">
                 <label for="travelDate" class="form-label">Travel Date</label>
-                <input type="date" class="form-control" id="travelDate" min="2025-01-01">
+                <input type="date" class="form-control" id="travelDate" 
+                       value="{{ package.start_date|date:'Y-m-d' }}" disabled>
               </div>
               <div class="mb-3">
                 <label for="travelers" class="form-label">Number of Travelers</label>
-                <select class="form-select" id="travelers">
-                  <option>1 Person</option>
-                  <option>2 People</option>
-                  <option>3 People</option>
-                  <option>4 People</option>
-                  <option>5+ People</option>
+                <select class="form-select" id="travelers" name="guest_count" onchange="updateTotalPrice()">
+                  <option value="1">1 Person</option>
+                  <option value="2">2 People</option>
+                  <option value="3">3 People</option>
+                  <option value="4">4 People</option>
+                  <option value="5">5 People</option>
                 </select>
               </div>
-              <div class="mb-3">
-                <label for="roomType" class="form-label">Room Type</label>
-                <select class="form-select" id="roomType">
-                  <option>Standard Room</option>
-                  <option>Deluxe Room (+৳2,000)</option>
-                  <option>Ocean View Suite (+৳5,000)</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="additionalServices" class="form-label">Additional Services</label>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="photoService">
-                  <label class="form-check-label" for="photoService">
-                    Professional Photography (+৳2,500)
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="privateGuide">
-                  <label class="form-check-label" for="privateGuide">
-                    Private Guide (+৳3,000)
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="airportTransfer">
-                  <label class="form-check-label" for="airportTransfer">
-                    VIP Airport Transfer (+৳1,500)
-                  </label>
-                </div>
-              </div>
+              <!-- Hidden field to store the total amount -->
+              <input type="hidden" id="total_amount" name="total_amount" value="{{ package.price }}">
               
               <div class="price-breakdown mt-4">
                 <h5 class="fw-bold mb-3">Price Breakdown</h5>
                 <div class="breakdown-item d-flex justify-content-between">
-                  <span>Base Price (1 Person)</span>
-                  <span>৳15,000</span>
+                  <span>Base Price (per person)</span>
+                  <span>৳{{ package.price }}</span>
                 </div>
                 <div class="breakdown-item d-flex justify-content-between">
-                  <span>Taxes & Fees</span>
-                  <span>৳1,500</span>
+                  <span>Number of Travelers</span>
+                  <span id="travelerCount">1</span>
                 </div>
                 <div class="breakdown-total d-flex justify-content-between mt-2">
                   <span class="fw-bold">Total</span>
-                  <span class="fw-bold">৳16,500</span>
+                  <span class="fw-bold" id="totalPrice">৳{{ package.price }}</span>
                 </div>
               </div>
               
               <div class="booking-actions mt-4">
-                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Book Now</button>
+                {% if user.is_authenticated %}
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Pay Now</button>
+                {% else %}
+                <a href="{% url 'login' %}?next={% url 'package-details' package.id %}" class="btn btn-primary btn-lg w-100 mb-3">Login to Book</a>
+                {% endif %}
                 <button type="button" class="btn btn-outline-primary w-100">Add to Wishlist</button>
               </div>
             </form>
@@ -443,6 +229,7 @@
           </div>
           
           <!-- Guide Contact Card -->
+          {% if package.tour_guide %}
           <div class="guide-contact-card mt-4">
             <h4 class="fw-bold mb-3">Have Questions?</h4>
             <p>Contact the tour guide directly for any inquiries about this package.</p>
@@ -452,8 +239,31 @@
               </a>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function updateTotalPrice() {
+    const basePrice = {{ package.price }};
+    const travelers = parseInt(document.getElementById('travelers').value);
+    const totalPrice = basePrice * travelers;
+    
+    // Update displayed values
+    document.getElementById('travelerCount').textContent = travelers;
+    document.getElementById('totalPrice').textContent = '৳' + totalPrice;
+    
+    // Update hidden field with total amount for backend
+    document.getElementById('total_amount').value = totalPrice;
+  }
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    updateTotalPrice();
+  });
+</script>
 {% endblock %}

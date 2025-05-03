@@ -2,6 +2,211 @@
 {% load static %}
 
 {% block content %}
+  <!-- Custom Styles -->
+  <style>
+    /* Carousel improvements */
+    #hero .carousel-item {
+      height: 80vh;
+      position: relative;
+    }
+    
+    #hero .carousel-item img {
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Enhanced card design */
+    .package-card {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      height: 100%;
+      background: #fff;
+      border: none;
+      position: relative;
+    }
+    
+    .package-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .package-card-img {
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .package-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .package-duration {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .package-duration i {
+      color: var(--bs-primary);
+    }
+    
+    .package-price {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--bs-primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .package-card-body {
+      padding: 20px;
+      background: #fff;
+    }
+    
+    .package-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .package-location {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .package-location i {
+      color: #dc3545;
+      font-size: 16px;
+    }
+    
+    .package-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .package-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .package-meta i {
+      color: #666;
+      font-size: 15px;
+    }
+    
+    .view-details-btn {
+      display: block;
+      margin: 15px auto 0;
+      width: fit-content;
+      min-width: 120px;
+      padding: 8px 20px;
+      border: 1px solid var(--bs-primary);
+      border-radius: 4px;
+      transition: all 0.3s;
+      background: transparent;
+      color: var(--bs-primary);
+      text-align: center;
+    }
+    
+    .view-details-btn:hover {
+      background: var(--bs-primary);
+      color: #fff;
+    }
+    
+    /* Search section improvements */
+    .search-section {
+      margin-top: -50px;
+      position: relative;
+      z-index: 100;
+    }
+    
+    .search-card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Feature cards improvement */
+    .feature-card {
+      padding: 30px 20px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(var(--bs-primary-rgb), 0.1);
+      color: var(--bs-primary);
+    }
+    
+    /* Become a guide section */
+    .become-guide {
+      background-color: #f8f9fa;
+    }
+    
+    .become-guide img {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-list {
+      padding-left: 0;
+      list-style: none;
+      margin-top: 20px;
+    }
+    
+    .feature-list li {
+      padding: 8px 0;
+    }
+  </style>
+
   <!-- Hero Section with Carousel -->
   <section id="hero" class="hero-section">
     <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -17,7 +222,6 @@
           <div class="carousel-caption">
             <h1 class="display-4 fw-bold text-white">Discover the Beauty of Bangladesh</h1>
             <p class="lead">Explore stunning beaches, lush forests, and vibrant cultures with our expert guides</p>
-            <a href="pages/packages.html" class="btn btn-primary btn-lg px-4 mt-3">Explore Packages</a>
           </div>
         </div>
         <div class="carousel-item">
@@ -26,7 +230,6 @@
           <div class="carousel-caption">
             <h1 class="display-4 fw-bold text-white">Adventure Awaits in Sundarban</h1>
             <p class="lead">Experience the world's largest mangrove forest with our experienced tour guides</p>
-            <a href="pages/packages.html" class="btn btn-primary btn-lg px-4 mt-3">Book Now</a>
           </div>
         </div>
         <div class="carousel-item">
@@ -35,7 +238,6 @@
           <div class="carousel-caption">
             <h1 class="display-4 fw-bold text-white">Explore the Tea Gardens of Sylhet</h1>
             <p class="lead">Immerse yourself in the lush greenery and cultural heritage of Bangladesh's tea country</p>
-            <a href="pages/packages.html" class="btn btn-primary btn-lg px-4 mt-3">View Itineraries</a>
           </div>
         </div>
       </div>
@@ -54,33 +256,26 @@
   <section class="search-section py-5">
     <div class="container">
       <div class="search-card">
-        <form class="row g-3">
-          <div class="col-md-4">
-            <label for="destination" class="form-label">Destination</label>
-            <select class="form-select" id="destination">
-              <option selected>Choose destination...</option>
-              <option>Cox's Bazar</option>
-              <option>Sylhet</option>
-              <option>Sundarban</option>
-              <option>Bandarban</option>
-              <option>Saint Martin</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label for="date" class="form-label">Date</label>
-            <input type="date" class="form-control" id="date">
-          </div>
-          <div class="col-md-3">
-            <label for="guests" class="form-label">Guests</label>
-            <select class="form-select" id="guests">
-              <option selected>1 Guest</option>
-              <option>2 Guests</option>
-              <option>3 Guests</option>
-              <option>4+ Guests</option>
-            </select>
-          </div>
-          <div class="col-md-2 align-self-end">
-            <button type="submit" class="btn btn-primary w-100">Search</button>
+        <form method="GET" action="{% url 'home' %}" id="filterForm" class="filter-form">
+          <div class="row">
+            <div class="col-md-5">
+              <label for="filterLocation" class="form-label">Filter by Location</label>
+              <select class="form-select" id="filterLocation" name="location" onchange="this.form.submit()">
+                <option value="">All Locations</option>
+                {% for location in tour_locations %}
+                  <option value="{{ location }}" {% if request.GET.location == location %}selected{% endif %}>{{ location }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-5">
+              <label for="filterDate" class="form-label">Filter by Date</label>
+              <input type="date" class="form-control" id="filterDate" name="date" value="{{ request.GET.date|default:'' }}" onchange="this.form.submit()">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              {% if request.GET.location or request.GET.date %}
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary w-100">Clear</a>
+              {% endif %}
+            </div>
           </div>
         </form>
       </div>
@@ -91,29 +286,39 @@
   <section class="featured-packages py-5">
     <div class="container">
       <div class="section-header text-center mb-5">
-        <h2 class="display-5 fw-bold">Featured Tour Packages</h2>
+        <h2 class="display-5 fw-bold">Tour Packages</h2>
         <p class="text-muted">Explore our most popular and highly-rated travel experiences</p>
       </div>
       
-      <div class="row g-4">
+      <div class="row g-4" id="packagesContainer">
         {% for package in packages %}
-        <div class="col-md-6 col-lg-4">
+        <div class="col-md-6 col-lg-4 package-item">
           <div class="package-card">
             <div class="package-card-img">
-              <img src="{{ package.image.url }}" alt="{{ package.title }}" class="img-fluid">
+              <img src="{{ package.image.url }}" alt="{{ package.title }}">
+              <div class="package-price">৳{{ package.price }}</div>
+              <div class="package-duration">
+                <i class="fas fa-clock"></i>
+                {{ package.start_date|date:"d M" }} - {{ package.end_date|date:"d M" }}
+              </div>
             </div>
             <div class="package-card-body">
-              <div class="d-flex justify-content-between mb-2">
-                <span class="badge bg-light text-dark"><i class="fas fa-calendar-alt me-1"></i> {{ package.start_date|date:"d M" }} - {{ package.end_date|date:"d M" }}</span>
-                <span class="text-primary fw-bold">৳{{ package.price }}</span>
-              </div>
               <h3 class="package-title">{{ package.title }}</h3>
-              <p class="package-location"><i class="fas fa-map-marker-alt text-danger"></i> {{ package.main_location }}</p>
-              <div class="package-meta d-flex justify-content-between mb-3">
-                {% for location in package.location.all %}
-                <span><i class="fas fa-hotel text-muted me-1"></i> {{ location.hotel }}</span>
-                {% endfor %}
-                <span><i class="fas fa-utensils text-muted me-1"></i> 
+              <p class="package-location">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ package.main_location }}
+              </p>
+              <div class="package-meta">
+                {% with first_location=package.location.first %}
+                {% if first_location %}
+                <span>
+                  <i class="fas fa-hotel"></i>
+                  {{ first_location.hotel }}
+                </span>
+                {% endif %}
+                {% endwith %}
+                <span>
+                  <i class="fas fa-utensils"></i>
                   {% if package.complementary == 'breakfast' %}
                     Breakfast
                   {% elif package.complementary == 'all_meals' %}
@@ -123,8 +328,17 @@
                   {% endif %}
                 </span>
               </div>
-              <a href="{% url 'package-details' package.id %}" class="btn btn-outline-primary w-100">View Details</a>
+              <a href="{% url 'package-details' package.id %}" class="view-details-btn">View Details</a>
             </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="no-results">
+            <i class="fas fa-search"></i>
+            <h3>No packages found</h3>
+            <p>Try adjusting your filters or search for a different location</p>
+            <a href="{% url 'home' %}" class="btn btn-outline-primary mt-3">Show All Packages</a>
           </div>
         </div>
         {% endfor %}
@@ -202,7 +416,4 @@
     </div>
   </section>
 
-
-
-
-  {% endblock %}
+{% endblock %}

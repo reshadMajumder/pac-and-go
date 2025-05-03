@@ -274,7 +274,7 @@
           
           <div class="card border-0 shadow-sm">
             <div class="card-body">
-              <form method="POST" action="{% url 'create-package' %}" enctype="multipart/form-data">
+              <form method="POST" action="{% url 'create-package' %}" enctype="multipart/form-data" id="packageForm">
                 {% csrf_token %}
                 
                 <div class="row mb-3">
@@ -283,7 +283,7 @@
                     <input type="text" class="form-control" id="title" name="title" required>
                   </div>
                   <div class="col-md-6">
-                    <label for="location" class="form-label">Location</label>
+                    <label for="location" class="form-label"> Main Location</label>
                     <input type="text" class="form-control" id="location" name="location" required>
                   </div>
                 </div>
@@ -327,7 +327,14 @@
                     <label class="form-label">Tour Locations</label>
                     <div id="locationContainer">
                       <div class="input-group mb-2">
-                        <input type="text" class="form-control" name="tour_location[]" placeholder="Location name">
+                        <select class="form-select location-select" name="tour_location[]">
+                          <option value="">Select Location</option>
+                          {% for location in tour_locations %}
+                            <option value="{{ location }}">{{ location }}</option>
+                          {% endfor %}
+                          <option value="new">+ Add New Location</option>
+                        </select>
+                        <input type="text" class="form-control new-location" style="display: none;" placeholder="Enter new location">
                         <input type="text" class="form-control" name="tour_hotel[]" placeholder="Hotel name">
                         <button type="button" class="btn btn-outline-success add-location">
                           <i class="fas fa-plus"></i>
@@ -344,6 +351,26 @@
                           <i class="fas fa-plus"></i>
                         </button>
                       </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Transportation</label>
+                  <div id="transportContainer">
+                    <div class="input-group mb-2">
+                      <select class="form-select vehicle-select" name="transport_vehicle[]">
+                        <option value="">Select Vehicle Type</option>
+                        {% for vehicle in transport_vehicles %}
+                          <option value="{{ vehicle }}">{{ vehicle }}</option>
+                        {% endfor %}
+                        <option value="new">+ Add New Vehicle Type</option>
+                      </select>
+                      <input type="text" class="form-control new-vehicle" style="display: none;" placeholder="Enter new vehicle type">
+                      <input type="text" class="form-control" name="transport_description[]" placeholder="Description">
+                      <button type="button" class="btn btn-outline-success add-transport">
+                        <i class="fas fa-plus"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -467,9 +494,9 @@
                             <i class="fas fa-file-alt"></i> Full Details
                           </a>
                           {% if booking.status == 'Pending' %}
-                          <button type="button" class="btn btn-sm btn-outline-danger cancel-booking" data-id="{{ booking.id }}">
+                          <a href="{% url 'remove-booking' booking.id %}" class="btn btn-sm btn-outline-danger cancel-booking" data-id="{{ booking.id }}">
                             <i class="fas fa-times"></i>
-                          </button>
+                          </a>
                           {% endif %}
                         </div>
                       </td>
@@ -739,7 +766,14 @@
           const newRow = document.createElement('div');
           newRow.className = 'input-group mb-2';
           newRow.innerHTML = `
-            <input type="text" class="form-control" name="tour_location[]" placeholder="Location name">
+            <select class="form-select location-select" name="tour_location[]">
+              <option value="">Select Location</option>
+              {% for location in tour_locations %}
+                <option value="{{ location }}">{{ location }}</option>
+              {% endfor %}
+              <option value="new">+ Add New Location</option>
+            </select>
+            <input type="text" class="form-control new-location" style="display: none;" placeholder="Enter new location">
             <input type="text" class="form-control" name="tour_hotel[]" placeholder="Hotel name">
             <button type="button" class="btn btn-outline-danger remove-row">
               <i class="fas fa-minus"></i>
@@ -752,8 +786,67 @@
           removeBtn.addEventListener('click', function() {
             this.closest('.input-group').remove();
           });
+          
+          // Add event listener for the new location select
+          const locationSelect = newRow.querySelector('.location-select');
+          locationSelect.addEventListener('change', handleLocationSelectChange);
         });
       }
+      
+      // Handle "Add New Location" functionality for all location selects
+      function handleLocationSelectChange() {
+        const newLocationInput = this.nextElementSibling;
+        if (this.value === 'new') {
+          // Show the new location input field
+          newLocationInput.style.display = 'block';
+          newLocationInput.required = true;
+          
+          // Hide the select temporarily
+          this.style.display = 'none';
+          
+          // Add blur event to the new location input
+          newLocationInput.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+              // Create a new option for the entered location
+              const newOption = document.createElement('option');
+              newOption.value = this.value.trim();
+              newOption.textContent = this.value.trim();
+              
+              // Add the new option to all location selects
+              document.querySelectorAll('.location-select').forEach(select => {
+                // Check if this option already exists
+                if (!Array.from(select.options).some(opt => opt.value === newOption.value)) {
+                  // Add before the "Add New Location" option
+                  select.insertBefore(newOption.cloneNode(true), select.lastElementChild);
+                }
+              });
+              
+              // Select the new option in the current select
+              const parentSelect = this.previousElementSibling;
+              parentSelect.value = this.value.trim();
+              
+              // Hide the input and show the select again
+              this.style.display = 'none';
+              parentSelect.style.display = 'block';
+              this.required = false;
+            } else {
+              // If empty, reset to default option
+              this.previousElementSibling.value = '';
+              this.style.display = 'none';
+              this.previousElementSibling.style.display = 'block';
+            }
+          });
+        } else {
+          // Hide the new location input if not "Add New Location"
+          newLocationInput.style.display = 'none';
+          newLocationInput.required = false;
+        }
+      }
+      
+      // Add event listeners to existing location selects
+      locationContainer.querySelectorAll('.location-select').forEach(select => {
+        select.addEventListener('change', handleLocationSelectChange);
+      });
     } else {
       console.error('locationContainer not found');
     }
@@ -789,6 +882,155 @@
     } else {
       console.error('highlightContainer not found');
     }
+    
+    // Check transport container
+    const transportContainer = document.getElementById('transportContainer');
+    if (transportContainer) {
+      console.log('transportContainer found:', transportContainer);
+      const addTransportBtn = transportContainer.querySelector('.add-transport');
+      console.log('addTransportBtn:', addTransportBtn);
+      
+      // Add direct event listener as a backup
+      if (addTransportBtn) {
+        addTransportBtn.addEventListener('click', function() {
+          console.log('Add transport clicked directly');
+          const newRow = document.createElement('div');
+          newRow.className = 'input-group mb-2';
+          newRow.innerHTML = `
+            <select class="form-select vehicle-select" name="transport_vehicle[]">
+              <option value="">Select Vehicle Type</option>
+              {% for vehicle in transport_vehicles %}
+                <option value="{{ vehicle }}">{{ vehicle }}</option>
+              {% endfor %}
+              <option value="new">+ Add New Vehicle Type</option>
+            </select>
+            <input type="text" class="form-control new-vehicle" style="display: none;" placeholder="Enter new vehicle type">
+            <input type="text" class="form-control" name="transport_description[]" placeholder="Description">
+            <button type="button" class="btn btn-outline-danger remove-row">
+              <i class="fas fa-minus"></i>
+            </button>
+          `;
+          transportContainer.appendChild(newRow);
+          
+          // Add event listener to the new remove button
+          const removeBtn = newRow.querySelector('.remove-row');
+          removeBtn.addEventListener('click', function() {
+            this.closest('.input-group').remove();
+          });
+          
+          // Add event listener for the new vehicle select
+          const vehicleSelect = newRow.querySelector('.vehicle-select');
+          if (vehicleSelect) {
+            vehicleSelect.addEventListener('change', handleVehicleSelectChange);
+          }
+        });
+      }
+    } else {
+      console.error('transportContainer not found');
+    }
+    
+    // Form submission handling
+    const packageForm = document.getElementById('packageForm');
+    if (packageForm) {
+      packageForm.addEventListener('submit', function(e) {
+        // Make sure all new location inputs are processed before submission
+        document.querySelectorAll('.new-location').forEach(input => {
+          if (input.style.display !== 'none' && input.value.trim() !== '') {
+            // Get the corresponding select element
+            const select = input.previousElementSibling;
+            
+            // Create a new option with the input value
+            const newOption = document.createElement('option');
+            newOption.value = input.value.trim();
+            newOption.textContent = input.value.trim();
+            
+            // Add it to the select and select it
+            select.insertBefore(newOption, select.lastElementChild);
+            select.value = input.value.trim();
+            
+            // Hide the input
+            input.style.display = 'none';
+            select.style.display = 'block';
+          }
+        });
+        
+        // Also process any new vehicle inputs
+        document.querySelectorAll('.new-vehicle').forEach(input => {
+          if (input.style.display !== 'none' && input.value.trim() !== '') {
+            // Get the corresponding select element
+            const select = input.previousElementSibling;
+            
+            // Create a new option with the input value
+            const newOption = document.createElement('option');
+            newOption.value = input.value.trim();
+            newOption.textContent = input.value.trim();
+            
+            // Add it to the select and select it
+            select.insertBefore(newOption, select.lastElementChild);
+            select.value = input.value.trim();
+            
+            // Hide the input
+            input.style.display = 'none';
+            select.style.display = 'block';
+          }
+        });
+      });
+    }
+  });
+
+  // Handle "Add New Vehicle Type" functionality for all vehicle selects
+  function handleVehicleSelectChange() {
+    const newVehicleInput = this.nextElementSibling;
+    if (this.value === 'new') {
+      // Show the new vehicle input field
+      newVehicleInput.style.display = 'block';
+      newVehicleInput.required = true;
+      
+      // Hide the select temporarily
+      this.style.display = 'none';
+      
+      // Add blur event to the new vehicle input
+      newVehicleInput.addEventListener('blur', function() {
+        if (this.value.trim() !== '') {
+          // Create a new option for the entered vehicle type
+          const newOption = document.createElement('option');
+          newOption.value = this.value.trim();
+          newOption.textContent = this.value.trim();
+          
+          // Add the new option to all vehicle selects
+          document.querySelectorAll('.vehicle-select').forEach(select => {
+            // Check if this option already exists
+            if (!Array.from(select.options).some(opt => opt.value === newOption.value)) {
+              // Add before the "Add New Vehicle Type" option
+              select.insertBefore(newOption.cloneNode(true), select.lastElementChild);
+            }
+          });
+          
+          // Select the new option in the current select
+          const parentSelect = this.previousElementSibling;
+          parentSelect.value = this.value.trim();
+          
+          // Hide the input and show the select again
+          this.style.display = 'none';
+          parentSelect.style.display = 'block';
+          this.required = false;
+        } else {
+          // If empty, reset to default option
+          this.previousElementSibling.value = '';
+          this.style.display = 'none';
+          this.previousElementSibling.style.display = 'block';
+        }
+      });
+    } else {
+      // Hide the new vehicle input if not "Add New Vehicle Type"
+      newVehicleInput.style.display = 'none';
+      newVehicleInput.required = false;
+    }
+  }
+  
+  // Add event listeners to existing vehicle selects
+  transportContainer.querySelectorAll('.vehicle-select').forEach(select => {
+    select.addEventListener('change', handleVehicleSelectChange);
   });
 </script>
 {% endblock %}
