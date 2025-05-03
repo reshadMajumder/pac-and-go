@@ -1,3 +1,13 @@
-<h2>Payment Successful!</h2>
-<p>Thank you for booking <strong>{{ booking.package.title }}</strong>.</p>
-<p>Status: {{ booking.status }}</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="5;url={% url 'home' %}" />
+    <title>Payment Success</title>
+</head>
+<body>
+    <h2>Payment Successful!</h2>
+    <p>Thank you for booking <strong>{{ booking.package.title }}</strong>.</p>
+    <p>Status: {{ booking.status }}</p>
+    <p>You will be redirected to the home page in 5 seconds...</p>
+</body>
+</html>
