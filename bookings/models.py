@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from auth_app.models import TourGuide
 
 # Create your models here.
 class TourLocation(models.Model):
@@ -20,6 +21,7 @@ class PackageHighlights(models.Model):
 
 
 class Packages(models.Model):
+    tour_guide = models.ForeignKey('auth_app.TourGuide', on_delete=models.CASCADE, related_name='packages',null= True,blank=True)
     title=models.CharField(max_length=100,null=True,blank=True)
     main_location=models.CharField(max_length=100,null=True,blank=True)
     price=models.IntegerField()
@@ -30,7 +32,6 @@ class Packages(models.Model):
     end_date=models.DateTimeField()
     details=models.TextField()
     complementary=models.CharField(max_length=20,null=True,blank=True ,choices=[('breakfast', 'Breakfast'), ('all_meals', 'All Meals'),('breakfast_lunch','Breakfast & Lunch')])
-    guide = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='packages', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
     

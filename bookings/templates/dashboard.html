@@ -106,19 +106,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body d-flex align-items-center">
-                  <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
-                    <i class="fas fa-star text-info fa-2x"></i>
-                  </div>
-                  <div>
-                    <h6 class="card-title mb-0">Rating</h6>
-                    <h2 class="mt-2 mb-0">4.8/5</h2>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
             {% else %}
             <!-- Traveler Stats -->
             <div class="col-md-4">
@@ -339,8 +327,8 @@
                     <label class="form-label">Tour Locations</label>
                     <div id="locationContainer">
                       <div class="input-group mb-2">
-                        <input type="text" class="form-control" name="tour_location" placeholder="Location name">
-                        <input type="text" class="form-control" name="tour_hotel" placeholder="Hotel name">
+                        <input type="text" class="form-control" name="tour_location[]" placeholder="Location name">
+                        <input type="text" class="form-control" name="tour_hotel[]" placeholder="Hotel name">
                         <button type="button" class="btn btn-outline-success add-location">
                           <i class="fas fa-plus"></i>
                         </button>
@@ -351,7 +339,7 @@
                     <label class="form-label">Package Highlights</label>
                     <div id="highlightContainer">
                       <div class="input-group mb-2">
-                        <input type="text" class="form-control" name="highlight" placeholder="Package highlight">
+                        <input type="text" class="form-control" name="highlight[]" placeholder="Package highlight">
                         <button type="button" class="btn btn-outline-success add-highlight">
                           <i class="fas fa-plus"></i>
                         </button>
@@ -385,10 +373,10 @@
                       <th>Booking ID</th>
                       <th>Package</th>
                       <th>Traveler</th>
+                      <th>Contact</th>
                       <th>Date</th>
                       <th>Amount</th>
                       <th>Status</th>
-                      <th>Transaction ID</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -397,7 +385,11 @@
                     <tr>
                       <td>#{{ booking.id }}</td>
                       <td>{{ booking.package.title }}</td>
-                      <td>{{ booking.user.first_name }} {{ booking.user.last_name }}</td>
+                      <td>
+                        <div>{{ booking.user.first_name }} {{ booking.user.last_name }}</div>
+                        <small class="text-muted">{{ booking.user.email }}</small>
+                      </td>
+                      <td>{{ booking.user.phone_number|default:"N/A" }}</td>
                       <td>{{ booking.created_at|date:"M d, Y" }}</td>
                       <td>৳{{ booking.amount }}</td>
                       <td>
@@ -405,23 +397,11 @@
                           {{ booking.status }}
                         </span>
                       </td>
-                      <td>{{ booking.transaction_id|default:"N/A" }}</td>
                       <td>
-                        <button type="button" class="btn btn-sm btn-primary view-booking-details" data-bs-toggle="modal" data-bs-target="#viewBookingModal" 
-                          data-id="{{ booking.id }}" 
-                          data-package="{{ booking.package.title }}" 
-                          data-traveler="{{ booking.user.first_name }} {{ booking.user.last_name }}" 
-                          data-email="{{ booking.user.email }}" 
-                          data-date="{{ booking.created_at|date:'M d, Y' }}" 
-                          data-status="{{ booking.status }}" 
-                          data-amount="{{ booking.amount }}" 
-                          data-transaction="{{ booking.transaction_id|default:'N/A' }}"
-                          data-traveler-phone="{{ booking.user.phone_number|default:'N/A' }}"
-                          data-guide-name="{{ booking.package.guide.first_name }} {{ booking.package.guide.last_name }}"
-                          data-guide-email="{{ booking.package.guide.email }}"
-                          data-guide-phone="{{ booking.package.guide.phone_number|default:'N/A' }}">
-                          <i class="fas fa-eye"></i> View Details
-                        </button>
+                        
+                        <a href="{% url 'order-details' booking.id %}" class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-file-alt"></i> Full Details
+                        </a>
                       </td>
                     </tr>
                     {% endfor %}
@@ -455,6 +435,8 @@
                     <tr>
                       <th>Booking ID</th>
                       <th>Package</th>
+                      <th>Tour Guide</th>
+                      <th>Contact</th>
                       <th>Date</th>
                       <th>Amount</th>
                       <th>Status</th>
@@ -465,7 +447,12 @@
                     {% for booking in traveler_bookings %}
                     <tr>
                       <td>#{{ booking.id }}</td>
-                      <td>{{ booking.package.title }}</td>
+                      <td>
+                        <div>{{ booking.package.title }}</div>
+                        <small class="text-muted">{{ booking.package.main_location }}</small>
+                      </td>
+                      <td>{{ booking.package.tour_guide.user.first_name }} {{ booking.package.tour_guide.user.last_name }}</td>
+                      <td>{{ booking.package.tour_guide.user.phone_number|default:"N/A" }}</td>
                       <td>{{ booking.created_at|date:"M d, Y" }}</td>
                       <td>৳{{ booking.amount }}</td>
                       <td>
@@ -475,21 +462,10 @@
                       </td>
                       <td>
                         <div class="btn-group">
-                          <button type="button" class="btn btn-sm btn-primary view-booking-details" data-bs-toggle="modal" data-bs-target="#viewBookingModal" 
-                            data-id="{{ booking.id }}" 
-                            data-package="{{ booking.package.title }}" 
-                            data-traveler="{{ user.first_name }} {{ user.last_name }}" 
-                            data-email="{{ user.email }}" 
-                            data-date="{{ booking.created_at|date:'M d, Y' }}" 
-                            data-status="{{ booking.status }}" 
-                            data-amount="{{ booking.amount }}" 
-                            data-transaction="{{ booking.transaction_id|default:'N/A' }}"
-                            data-guide-name="{{ booking.package.guide.first_name }} {{ booking.package.guide.last_name }}"
-                            data-guide-email="{{ booking.package.guide.email }}"
-                            data-guide-phone="{{ booking.package.guide.phone_number|default:'N/A' }}"
-                            data-traveler-phone="{{ user.phone_number|default:'N/A' }}">
-                            <i class="fas fa-eye"></i> View Details
-                          </button>
+
+                          <a href="{% url 'order-details' booking.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-file-alt"></i> Full Details
+                          </a>
                           {% if booking.status == 'Pending' %}
                           <button type="button" class="btn btn-sm btn-outline-danger cancel-booking" data-id="{{ booking.id }}">
                             <i class="fas fa-times"></i>
@@ -735,284 +711,83 @@
 </div>
 
 <!-- Modal for Viewing Booking Details -->
-<div class="modal fade" id="viewBookingModal" tabindex="-1" aria-labelledby="viewBookingModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="viewBookingModalLabel">Booking Details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="booking-details">
-          <div class="mb-3 text-center">
-            <span class="badge bg-secondary" id="booking-status-badge">Pending</span>
-          </div>
-          
-          <div class="row mb-4">
-            <div class="col-md-6">
-              <div class="row mb-3">
-                <div class="col-5 text-muted">Booking ID:</div>
-                <div class="col-7" id="booking-id">#000</div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-5 text-muted">Package:</div>
-                <div class="col-7" id="booking-package">Package Name</div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-5 text-muted">Booking Date:</div>
-                <div class="col-7" id="booking-date">Jan 1, 2023</div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-5 text-muted">Amount:</div>
-                <div class="col-7 fw-bold" id="booking-amount">৳0</div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-5 text-muted">Transaction ID:</div>
-                <div class="col-7" id="booking-transaction">N/A</div>
-              </div>
-            </div>
-            
-            <div class="col-md-6">
-              <div class="card border-0 bg-light mb-3">
-                <div class="card-header bg-transparent border-bottom-0">
-                  <h6 class="mb-0">Tour Guide Information</h6>
-                </div>
-                <div class="card-body pt-0">
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Name:</div>
-                    <div class="col-7" id="guide-name">Guide Name</div>
-                  </div>
-                  
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Email:</div>
-                    <div class="col-7" id="guide-email">guide@example.com</div>
-                  </div>
-                  
-                  <div class="row">
-                    <div class="col-5 text-muted">Phone:</div>
-                    <div class="col-7" id="guide-phone">N/A</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="card border-0 bg-light">
-                <div class="card-header bg-transparent border-bottom-0">
-                  <h6 class="mb-0">Traveler Information</h6>
-                </div>
-                <div class="card-body pt-0">
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Name:</div>
-                    <div class="col-7" id="booking-traveler">Traveler Name</div>
-                  </div>
-                  
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Email:</div>
-                    <div class="col-7" id="booking-email">traveler@example.com</div>
-                  </div>
-                  
-                  <div class="row">
-                    <div class="col-5 text-muted">Phone:</div>
-                    <div class="col-7" id="traveler-phone">N/A</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 {% endblock %}
 
 {% block scripts %}
+<script src="{% static 'js/dashboard.js' %}"></script>
 <script>
+  // Troubleshooting script - will be displayed in console
+  console.log('Inline script loaded from dashboard.html');
+  
+  // Check if + buttons exist for locations and highlights
   document.addEventListener('DOMContentLoaded', function() {
-    // Edit Profile Functionality
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const profileForm = document.getElementById('profileForm');
-    const profileButtons = document.getElementById('profileButtons');
+    console.log('DOM loaded from inline script');
     
-    editProfileBtn.addEventListener('click', function() {
-      const inputs = profileForm.querySelectorAll('input, textarea');
-      inputs.forEach(input => {
-        if (input.type !== 'hidden') {
-          input.disabled = false;
-        }
-      });
-      profileButtons.style.display = 'block';
-      editProfileBtn.style.display = 'none';
-    });
-    
-    cancelEditBtn.addEventListener('click', function() {
-      const inputs = profileForm.querySelectorAll('input, textarea');
-      inputs.forEach(input => {
-        if (input.type !== 'hidden') {
-          input.disabled = true;
-        }
-      });
-      profileButtons.style.display = 'none';
-      editProfileBtn.style.display = 'inline-block';
-    });
-    
-    {% if user.user_type == 'tour_guide' %}
-    // Delete Package Functionality
-    const deletePackageBtns = document.querySelectorAll('.delete-package');
-    const deletePackageForm = document.getElementById('deletePackageForm');
-    
-    deletePackageBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const packageId = this.getAttribute('data-id');
-        const actionUrl = "{% url 'delete-package' 0 %}".replace('0', packageId);
-        deletePackageForm.setAttribute('action', actionUrl);
-      });
-    });
-    
-    // Add More Locations
-    const addLocationBtn = document.querySelector('.add-location');
+    // Check location container
     const locationContainer = document.getElementById('locationContainer');
-    
-    addLocationBtn.addEventListener('click', function() {
-      const newRow = document.createElement('div');
-      newRow.className = 'input-group mb-2';
-      newRow.innerHTML = `
-        <input type="text" class="form-control" name="tour_location" placeholder="Location name">
-        <input type="text" class="form-control" name="tour_hotel" placeholder="Hotel name">
-        <button type="button" class="btn btn-outline-danger remove-row">
-          <i class="fas fa-minus"></i>
-        </button>
-      `;
-      locationContainer.appendChild(newRow);
+    if (locationContainer) {
+      console.log('locationContainer found:', locationContainer);
+      const addLocationBtn = locationContainer.querySelector('.add-location');
+      console.log('addLocationBtn:', addLocationBtn);
       
-      // Add event listener to the new remove button
-      newRow.querySelector('.remove-row').addEventListener('click', function() {
-        locationContainer.removeChild(newRow);
-      });
-    });
-    
-    // Add More Highlights
-    const addHighlightBtn = document.querySelector('.add-highlight');
-    const highlightContainer = document.getElementById('highlightContainer');
-    
-    addHighlightBtn.addEventListener('click', function() {
-      const newRow = document.createElement('div');
-      newRow.className = 'input-group mb-2';
-      newRow.innerHTML = `
-        <input type="text" class="form-control" name="highlight" placeholder="Package highlight">
-        <button type="button" class="btn btn-outline-danger remove-row">
-          <i class="fas fa-minus"></i>
-        </button>
-      `;
-      highlightContainer.appendChild(newRow);
-      
-      // Add event listener to the new remove button
-      newRow.querySelector('.remove-row').addEventListener('click', function() {
-        highlightContainer.removeChild(newRow);
-      });
-    });
-    {% endif %}
-    
-    // For travelers
-    {% if user.user_type != 'tour_guide' %}
-    // Cancel booking functionality
-    const cancelBookingBtns = document.querySelectorAll('.cancel-booking');
-    if (cancelBookingBtns.length > 0) {
-      cancelBookingBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          if (confirm('Are you sure you want to cancel this booking?')) {
-            const bookingId = this.getAttribute('data-id');
-            // Implement cancel booking logic here
-            // window.location.href = `/cancel-booking/${bookingId}/`;
-          }
-        });
-      });
-    }
-    
-    // Remove saved package functionality
-    const removeSavedBtns = document.querySelectorAll('.remove-saved');
-    if (removeSavedBtns.length > 0) {
-      removeSavedBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          const packageId = this.getAttribute('data-id');
-          // Implement remove saved package logic here
-          // window.location.href = `/remove-saved-package/${packageId}/`;
-        });
-      });
-    }
-    {% endif %}
-    
-    // Handle booking details modal
-    const viewBookingModal = document.getElementById('viewBookingModal');
-    if (viewBookingModal) {
-      viewBookingModal.addEventListener('show.bs.modal', function(event) {
-        const button = event.relatedTarget;
-        
-        // Get data from button attributes
-        const id = button.getAttribute('data-id');
-        const package = button.getAttribute('data-package');
-        const traveler = button.getAttribute('data-traveler');
-        const email = button.getAttribute('data-email');
-        const date = button.getAttribute('data-date');
-        const status = button.getAttribute('data-status');
-        const amount = button.getAttribute('data-amount');
-        const transaction = button.getAttribute('data-transaction');
-        const guideName = button.getAttribute('data-guide-name');
-        const guideEmail = button.getAttribute('data-guide-email');
-        const guidePhone = button.getAttribute('data-guide-phone');
-        const travelerPhone = button.getAttribute('data-traveler-phone');
-        
-        console.log('Booking ID:', id);
-        console.log('Package:', package);
-        console.log('Traveler:', traveler);
-        console.log('Guide Name:', guideName);
-        
-        // Safely update elements (only if they exist)
-        function updateElement(id, value) {
-          const element = document.getElementById(id);
-          if (element) {
-            element.textContent = value;
-          } else {
-            console.error('Element not found:', id);
-          }
-        }
-        
-        // Update modal content
-        updateElement('booking-id', '#' + (id || '000'));
-        updateElement('booking-package', package || 'Package Name');
-        updateElement('booking-traveler', traveler || 'Traveler Name');
-        updateElement('booking-email', email || 'traveler@example.com');
-        updateElement('booking-date', date || 'Jan 1, 2023');
-        updateElement('booking-amount', '৳' + (amount || '0'));
-        updateElement('booking-transaction', transaction || 'N/A');
-        updateElement('guide-name', guideName || 'Guide Name');
-        updateElement('guide-email', guideEmail || 'guide@example.com');
-        updateElement('guide-phone', guidePhone || 'N/A');
-        updateElement('traveler-phone', travelerPhone || 'N/A');
-        
-        // Update status badge
-        const statusBadge = document.getElementById('booking-status-badge');
-        if (statusBadge) {
-          statusBadge.textContent = status || 'Pending';
-          statusBadge.className = 'badge';
+      // Add direct event listener as a backup
+      if (addLocationBtn) {
+        addLocationBtn.addEventListener('click', function() {
+          console.log('Add location clicked directly');
+          const newRow = document.createElement('div');
+          newRow.className = 'input-group mb-2';
+          newRow.innerHTML = `
+            <input type="text" class="form-control" name="tour_location[]" placeholder="Location name">
+            <input type="text" class="form-control" name="tour_hotel[]" placeholder="Hotel name">
+            <button type="button" class="btn btn-outline-danger remove-row">
+              <i class="fas fa-minus"></i>
+            </button>
+          `;
+          locationContainer.appendChild(newRow);
           
-          if (status === 'Success') {
-            statusBadge.classList.add('bg-success');
-          } else if (status === 'Pending') {
-            statusBadge.classList.add('bg-warning');
-          } else {
-            statusBadge.classList.add('bg-danger');
-          }
-        }
-      });
+          // Add event listener to the new remove button
+          const removeBtn = newRow.querySelector('.remove-row');
+          removeBtn.addEventListener('click', function() {
+            this.closest('.input-group').remove();
+          });
+        });
+      }
+    } else {
+      console.error('locationContainer not found');
+    }
+    
+    // Check highlight container
+    const highlightContainer = document.getElementById('highlightContainer');
+    if (highlightContainer) {
+      console.log('highlightContainer found:', highlightContainer);
+      const addHighlightBtn = highlightContainer.querySelector('.add-highlight');
+      console.log('addHighlightBtn:', addHighlightBtn);
+      
+      // Add direct event listener as a backup
+      if (addHighlightBtn) {
+        addHighlightBtn.addEventListener('click', function() {
+          console.log('Add highlight clicked directly');
+          const newRow = document.createElement('div');
+          newRow.className = 'input-group mb-2';
+          newRow.innerHTML = `
+            <input type="text" class="form-control" name="highlight[]" placeholder="Package highlight">
+            <button type="button" class="btn btn-outline-danger remove-row">
+              <i class="fas fa-minus"></i>
+            </button>
+          `;
+          highlightContainer.appendChild(newRow);
+          
+          // Add event listener to the new remove button
+          const removeBtn = newRow.querySelector('.remove-row');
+          removeBtn.addEventListener('click', function() {
+            this.closest('.input-group').remove();
+          });
+        });
+      }
+    } else {
+      console.error('highlightContainer not found');
     }
   });
 </script>

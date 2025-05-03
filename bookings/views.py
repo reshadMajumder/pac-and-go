@@ -39,27 +39,41 @@ def dashboard(request):
     # Check user type and prepare specific context
     if hasattr(request.user, 'user_type'):
         if request.user.user_type == 'tour_guide':
-            # Tour guide specific context
-            packages = Packages.objects.filter(guide=request.user)
-            
-            # Get bookings for all packages created by this guide
-            bookings = Booking.objects.filter(package__in=packages).select_related('user', 'package')
-            
-            # Get user's own bookings (as traveler)
-            traveler_bookings = Booking.objects.filter(user=request.user).select_related('package')
-            
-            recent_activities = []
-            
-            context.update({
-                "packages": packages,
-                "bookings": bookings,
-                "traveler_bookings": traveler_bookings,
-                "recent_activities": recent_activities,
-                "guide_profile": request.user.guide_profile if hasattr(request.user, 'guide_profile') else None,
-            })
+            # Get tour guide profile
+            try:
+                tour_guide = request.user.guide_profile
+                
+                # Tour guide specific context
+                packages = Packages.objects.filter(tour_guide=tour_guide)
+                
+                # Get bookings for all packages created by this guide
+                bookings = Booking.objects.filter(package__in=packages).select_related('user', 'package', 'package__tour_guide', 'package__tour_guide__user')
+                
+                # Get user's own bookings (as traveler)
+                traveler_bookings = Booking.objects.filter(user=request.user).select_related('package', 'package__tour_guide', 'package__tour_guide__user')
+                
+                recent_activities = []
+                
+                context.update({
+                    "packages": packages,
+                    "bookings": bookings,
+                    "traveler_bookings": traveler_bookings,
+                    "recent_activities": recent_activities,
+                    "guide_profile": tour_guide,
+                })
+            except:
+                # Handle case where guide profile doesn't exist
+                context.update({
+                    "packages": [],
+                    "bookings": [],
+                    "traveler_bookings": [],
+                    "recent_activities": [],
+                    "guide_profile": None,
+                    "profile_error": "Please complete your tour guide profile.",
+                })
         else:
             # Traveler specific context
-            traveler_bookings = Booking.objects.filter(user=request.user).select_related('package')
+            traveler_bookings = Booking.objects.filter(user=request.user).select_related('package', 'package__tour_guide', 'package__tour_guide__user')
             saved_packages = []  # In the future, you can add: SavedPackage.objects.filter(traveler__user=request.user)
             upcoming_trips = traveler_bookings.filter(status='Success').count()  # Count of upcoming bookings
             featured_packages = Packages.objects.all().order_by('-created_at')[:6]  # Get some featured packages
@@ -80,6 +94,12 @@ def create_package(request):
     if not hasattr(request.user, 'user_type') or request.user.user_type != 'tour_guide':
         return HttpResponseForbidden("Access denied. You must be a tour guide to access this page.")
     
+    # Get the tour guide profile associated with the user
+    try:
+        tour_guide = request.user.guide_profile
+    except:
+        return HttpResponseForbidden("You need to complete your tour guide profile first.")
+    
     if request.method == 'POST':
         try:
             # Get form data
@@ -95,19 +115,19 @@ def create_package(request):
             # Create the package without many-to-many fields first
             package = Packages.objects.create(
                 title=title,
-                main_location=location_str,  # Use main_location instead of location
+                main_location=location_str,
                 price=price,
                 image=image,
                 start_date=start_date,
                 end_date=end_date,
                 details=details,
                 complementary=complementary,
-                guide=request.user
+                tour_guide=tour_guide
             )
             
             # Handle tour locations
-            tour_locations = request.POST.getlist('tour_location')
-            tour_hotels = request.POST.getlist('tour_hotel')
+            tour_locations = request.POST.getlist('tour_location[]')
+            tour_hotels = request.POST.getlist('tour_hotel[]')
             
             for i in range(len(tour_locations)):
                 if tour_locations[i] and i < len(tour_hotels):
@@ -118,7 +138,7 @@ def create_package(request):
                     package.location.add(location)  # Adding to many-to-many field
             
             # Handle package highlights
-            highlights = request.POST.getlist('highlight')
+            highlights = request.POST.getlist('highlight[]')
             for highlight_text in highlights:
                 if highlight_text:
                     highlight = PackageHighlights.objects.create(highlight=highlight_text)
@@ -131,7 +151,7 @@ def create_package(request):
         return redirect('dashboard')
     
     # If not POST, redirect to the dashboard
-    return redirect('guide_dashboard')
+    return redirect('dashboard')
 
 @login_required
 def delete_package(request, package_id):
@@ -139,10 +159,16 @@ def delete_package(request, package_id):
     if not hasattr(request.user, 'user_type') or request.user.user_type != 'tour_guide':
         return HttpResponseForbidden("Access denied. You must be a tour guide to access this page.")
     
+    # Get the tour guide profile
+    try:
+        tour_guide = request.user.guide_profile
+    except:
+        return HttpResponseForbidden("You need to complete your tour guide profile first.")
+    
     package = get_object_or_404(Packages, id=package_id)
     
     # Check if the package belongs to the logged-in guide
-    if package.guide != request.user:
+    if package.tour_guide.user != request.user:
         return HttpResponseForbidden("You cannot delete a package that doesn't belong to you.")
     
     if request.method == 'POST':
@@ -157,17 +183,23 @@ def update_package(request, package_id):
     if not hasattr(request.user, 'user_type') or request.user.user_type != 'tour_guide':
         return HttpResponseForbidden("Access denied. You must be a tour guide to access this page.")
     
+    # Get the tour guide profile
+    try:
+        tour_guide = request.user.guide_profile
+    except:
+        return HttpResponseForbidden("You need to complete your tour guide profile first.")
+    
     package = get_object_or_404(Packages, id=package_id)
     
     # Check if the package belongs to the logged-in guide
-    if package.guide != request.user:
+    if package.tour_guide.user != request.user:
         return HttpResponseForbidden("You cannot update a package that doesn't belong to you.")
     
     if request.method == 'POST':
         try:
             # Get form data
             package.title = request.POST.get('title')
-            package.main_location = request.POST.get('location')  # Use main_location instead of location
+            package.main_location = request.POST.get('location')
             package.price = request.POST.get('price')
             if 'image' in request.FILES:
                 package.image = request.FILES.get('image')
@@ -180,8 +212,8 @@ def update_package(request, package_id):
             
             # Handle tour locations (clear existing and add new)
             package.location.clear()
-            tour_locations = request.POST.getlist('tour_location')
-            tour_hotels = request.POST.getlist('tour_hotel')
+            tour_locations = request.POST.getlist('tour_location[]')
+            tour_hotels = request.POST.getlist('tour_hotel[]')
             
             for i in range(len(tour_locations)):
                 if tour_locations[i] and i < len(tour_hotels):
@@ -193,7 +225,7 @@ def update_package(request, package_id):
             
             # Handle package highlights (clear existing and add new)
             package.highlight.clear()
-            highlights = request.POST.getlist('highlight')
+            highlights = request.POST.getlist('highlight[]')
             for highlight_text in highlights:
                 if highlight_text:
                     highlight = PackageHighlights.objects.create(highlight=highlight_text)
@@ -248,3 +280,33 @@ def update_profile_picture(request):
         messages.success(request, 'Profile picture updated successfully!')
     
     return redirect('dashboard')
+
+@login_required
+def order_details(request, booking_id):
+    """View to display detailed information about a specific booking."""
+    # Get the booking and check permissions
+    booking = get_object_or_404(Booking, id=booking_id)
+    
+    # Security check: only the traveler who booked or the tour guide of the package can view
+    is_owner = booking.user == request.user
+    is_guide = False
+    
+    # Check if the user is a tour guide and has access to this booking
+    if hasattr(request.user, 'user_type') and request.user.user_type == 'tour_guide':
+        try:
+            tour_guide = request.user.guide_profile
+            if booking.package.tour_guide == tour_guide:
+                is_guide = True
+        except:
+            pass
+    
+    if not (is_owner or is_guide):
+        return HttpResponseForbidden("You don't have permission to view this booking.")
+    
+    context = {
+        'booking': booking,
+        'is_owner': is_owner,
+        'is_guide': is_guide,
+    }
+    
+    return render(request, 'order_details.html', context)

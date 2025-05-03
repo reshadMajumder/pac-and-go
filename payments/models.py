@@ -7,7 +7,7 @@ from django.conf import settings
 from bookings.models import Packages # Assuming Package model is in a 'tour' app
 
 class Booking(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null =True ,blank= True)
     package = models.ForeignKey(Packages, on_delete=models.CASCADE)
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
