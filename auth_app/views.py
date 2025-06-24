@@ -10,6 +10,29 @@ from django .contrib.auth import login as auth_login
 
 
 def register(request):
+    """
+    Handles user registration for both Travelers and Tour Guides.
+
+    For POST requests, it processes the registration form data. It determines the
+    user type ('traveler' or 'tour_guide') from the form.
+
+    For a 'traveler':
+    - Validates that the passwords match.
+    - Checks if a user with the given email already exists.
+    - Creates a new CustomUser instance with user_type='traveler'.
+    - Creates an associated Traveler profile.
+    - Logs the new user in and redirects to the homepage.
+
+    For a 'tour_guide':
+    - Validates that the passwords match.
+    - Checks if a user with the given email already exists.
+    - Creates a new CustomUser instance with user_type='tour_guide'.
+    - Creates an associated TourGuide profile with location, experience, and bio.
+    - Logs the new user in and redirects to the homepage.
+
+    Handles exceptions during the process and displays error messages.
+    For GET requests, it simply renders the registration page.
+    """
     if request.method == 'POST':
         # Debug: Print POST data
         print("POST data received:")
@@ -128,6 +151,18 @@ def register(request):
 
 
 def  handle_login(request):
+    """
+    Handles user authentication and login.
+
+    For POST requests, it attempts to authenticate the user using the provided
+    email and password.
+    - If authentication is successful, the user is logged in, and they are
+      redirected to the 'home' page.
+    - If authentication fails, an error message is displayed, and the user is
+      redirected back to the 'login' page.
+
+    For GET requests, it renders the login page.
+    """
     if request.method ==  "POST":
         data=request.POST
 
@@ -153,5 +188,11 @@ def  handle_login(request):
 
 
 def handlelogout(request):
+    """
+    Logs the current user out of the application.
+
+    This view logs out the user who made the request and then redirects them
+    to the 'home' page.
+    """
     logout(request)
     return redirect('home')

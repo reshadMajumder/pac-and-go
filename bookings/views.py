@@ -10,6 +10,10 @@ from payments.models import Booking
 
 
 def home(request):
+    """
+    Displays the home page with a list of all tour packages.
+    Handles filtering of packages based on location and date provided in GET parameters.
+    """
     # Get all packages initially
     packages = Packages.objects.all()
     
@@ -43,18 +47,34 @@ def home(request):
 
 
 def package_details(request, package_id):
+    """
+    Displays the detailed view of a single tour package.
+    """
     package = get_object_or_404(Packages, id=package_id)
     return render(request, 'package-details.html', {'package': package})
 
 def about_us(request):
+    """
+    Renders the 'About Us' page.
+    """
     return render(request,'about.html')
 
 def contact_us(request):
+    """
+    Renders the 'Contact Us' page.
+    """
     return render(request,'contact.html')
 
 
 @login_required
 def dashboard(request):
+    """
+    Displays the user's dashboard.
+    The content of the dashboard is customized based on the user's type
+    ('tour_guide' or 'traveler').
+    For tour guides, it shows their created packages and bookings.
+    For travelers, it shows their bookings and featured packages.
+    """
     # Common context for all users
     context = {
         "today": datetime.today(),
@@ -122,6 +142,12 @@ def dashboard(request):
 
 @login_required
 def create_package(request):
+    """
+    Handles the creation of a new tour package.
+    This view is restricted to users with the 'tour_guide' user type.
+    It processes POST requests containing package details and creates the
+    package along with its associated locations, highlights, and transport options.
+    """
     # Check if the user is a tour guide
     if not hasattr(request.user, 'user_type') or request.user.user_type != 'tour_guide':
         return HttpResponseForbidden("Access denied. You must be a tour guide to access this page.")
@@ -248,6 +274,11 @@ def create_package(request):
 
 @login_required
 def delete_package(request, package_id):
+    """
+    Handles the deletion of a specific package.
+    Ensures that the user is a tour guide and is the owner of the package
+    before allowing deletion.
+    """
     # Check if the user is a tour guide
     if not hasattr(request.user, 'user_type') or request.user.user_type != 'tour_guide':
         return HttpResponseForbidden("Access denied. You must be a tour guide to access this page.")
@@ -272,6 +303,12 @@ def delete_package(request, package_id):
 
 @login_required
 def update_package(request, package_id):
+    """
+    Handles updating an existing tour package.
+    This view is restricted to the tour guide who owns the package.
+    It processes POST requests with updated package data, including clearing
+    and re-adding related many-to-many field entries.
+    """
     # Check if the user is a tour guide
     if not hasattr(request.user, 'user_type') or request.user.user_type != 'tour_guide':
         return HttpResponseForbidden("Access denied. You must be a tour guide to access this page.")
@@ -335,6 +372,11 @@ def update_package(request, package_id):
 
 @login_required
 def update_profile(request):
+    """
+    Handles updating the user's profile information.
+    It updates common user fields (name, phone, address) and also
+    updates user-type specific profiles (TourGuideProfile or TravelerProfile).
+    """
     if request.method == 'POST':
         # Update user information
         request.user.first_name = request.POST.get('first_name')
@@ -367,6 +409,10 @@ def update_profile(request):
 
 @login_required
 def update_profile_picture(request):
+    """
+    Handles updating the user's profile picture.
+    Processes a POST request containing the new image file.
+    """
     if request.method == 'POST' and 'profile_picture' in request.FILES:
         request.user.profile_picture = request.FILES.get('profile_picture')
         request.user.save()
@@ -376,7 +422,12 @@ def update_profile_picture(request):
 
 @login_required
 def order_details(request, booking_id):
-    """View to display detailed information about a specific booking."""
+    """
+    View to display detailed information about a specific booking.
+    
+    Ensures that only the traveler who made the booking or the tour guide
+    associated with the package can view the details.
+    """
     # Get the booking and check permissions
     booking = get_object_or_404(Booking, id=booking_id)
     
@@ -406,7 +457,9 @@ def order_details(request, booking_id):
 
 
 def remove_booking(request,booking_id):
+    """
+    Deletes a booking record from the database.
+    """
     booking=get_object_or_404(Booking,id=booking_id)
     booking.delete()
     return redirect('dashboard')
-
