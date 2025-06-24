@@ -123,17 +123,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 import os
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Optional: Where you keep your development static files
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Make sure this folder exists or remove it
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -145,8 +139,7 @@ AUTH_USER_MODEL = 'auth_app.CustomUser'
 # settings.py
 SSL_COMMERZ_STORE_ID =os.getenv('SSL_COMMERZ_STORE_ID')
 SSL_COMMERZ_STORE_PASSWORD =os.getenv('SSL_COMMERZ_STORE_PASSWORD')
-SSL_COMMERZ_SANDBOX_MODE = os.getenv('SSL_COMMERZ_SANDBOX_MODE') 
-
+SSL_COMMERZ_SANDBOX_MODE = os.getenv('SSL_COMMERZ_SANDBOX_MODE')  # False in production
 
 SSL_SUCCESS_URL = 'http://127.0.0.1:8000/payment/success/'
 SSL_FAIL_URL = 'http://127.0.0.1:8000/payment/fail/'
